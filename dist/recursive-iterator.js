@@ -45,6 +45,7 @@ var RecursiveIterator = (function () {
         this.__cache = [];
         this.__stack = [];
         this.__saveState(root, RecursiveIterator.getKeys(root), []);
+        this.__makeIterable();
     }
 
     _prototypeProperties(RecursiveIterator, {
@@ -75,13 +76,10 @@ var RecursiveIterator = (function () {
     }, {
         next: {
             /**
-             * @param {Function} [preventStepInto]
              * @returns {Object}
              */
 
             value: function next() {
-                var preventStepInto = arguments[0] === undefined ? this.__preventStepInto : arguments[0];
-
                 var _getState = this.__getState();
 
                 var _getState2 = _slicedToArray(_getState, 3);
@@ -92,12 +90,15 @@ var RecursiveIterator = (function () {
 
                 var item = {
                     value: { node: node, value: value, key: key, path: path },
-                    done: !this.__stack.length
+                    done: true
                 };
 
                 if (!node) {
+                    this.destroy();
                     return item;
-                }var key = keys.shift();
+                }
+
+                var key = keys.shift();
                 var value = node[key];
                 var way = path.concat(key);
 
@@ -105,10 +106,10 @@ var RecursiveIterator = (function () {
                 this.__saveState(node, keys, path);
 
                 item.value = { node: node, value: value, key: key, path: way };
-                item.done = !this.__stack.length;
+                item.done = false;
 
                 if (RecursiveIterator.isObject(value)) {
-                    if (preventStepInto(item)) {
+                    if (this.__preventStepInto(item)) {
                         return this.next();
                     }if (this.__cache.indexOf(value) !== -1) {
                         if (this.__ignoreCircularReferences) {
@@ -123,8 +124,6 @@ var RecursiveIterator = (function () {
                     } else {
                         this.__saveState(value, RecursiveIterator.getKeys(value), way);
                     }
-
-                    item.done = !this.__stack.length;
                 }
 
                 return item;
@@ -140,6 +139,25 @@ var RecursiveIterator = (function () {
             value: function destroy() {
                 this.__stack.length = 0;
                 this.__cache.length = 0;
+            },
+            writable: true,
+            configurable: true
+        },
+        __makeIterable: {
+            /**
+             * Only for es6
+             * @private
+             */
+
+            value: function __makeIterable() {
+                var _this = this;
+
+                try {
+                    var __Symbol = Symbol;
+                    this[__Symbol.iterator] = function () {
+                        return _this;
+                    };
+                } catch (e) {}
             },
             writable: true,
             configurable: true

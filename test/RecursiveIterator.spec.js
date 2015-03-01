@@ -25,14 +25,13 @@ describe('Vertical bypass method (bypassMode = 0)', function() {
     var stack = [];
 
     var iterator = new RecursiveIterator(root);
-    do {
-        var item = iterator.next();
+    for(var item = iterator.next(); !item.done; item = iterator.next()) {
         var state = item.value;
         stack.push(state.node);
         stack.push(state.value);
         stack.push(state.key);
         stack.push(state.path);
-    } while(!item.done);
+    }
 
     it('foo [node, value, key, path]', function() {
         expect(stack.shift()).toBe(root);
@@ -65,14 +64,13 @@ describe('Horizontal bypass method (bypassMode = 1)', function() {
     var stack = [];
 
     var iterator = new RecursiveIterator(root, 1);
-    do {
-        var item = iterator.next();
+    for(var item = iterator.next(); !item.done; item = iterator.next()) {
         var state = item.value;
         stack.push(state.node);
         stack.push(state.value);
         stack.push(state.key);
         stack.push(state.path);
-    } while(!item.done);
+    }
 
     it('foo [node, value, key, path]', function() {
         expect(stack.shift()).toBe(root);
@@ -105,14 +103,13 @@ describe('Circular references (exception)', function() {
 
     try {
         var iterator = new RecursiveIterator(root);
-        do {
-            var item = iterator.next();
+        for(var item = iterator.next(); !item.done; item = iterator.next()) {
             var state = item.value;
             stack.push(state.node);
             stack.push(state.value);
             stack.push(state.key);
             stack.push(state.path);
-        } while(!item.done);
+        }
     } catch (e) {
         var error = e;
     }
@@ -134,14 +131,13 @@ describe('Circular references (ignore)', function() {
 
     try {
         var iterator = new RecursiveIterator(root, 0, true);
-        do {
-            var item = iterator.next();
+        for(var item = iterator.next(); !item.done; item = iterator.next()) {
             var state = item.value;
             stack.push(state.node);
             stack.push(state.value);
             stack.push(state.key);
             stack.push(state.path);
-        } while(!item.done);
+        }
     } catch (e) {
         var error = e;
     }
@@ -166,42 +162,13 @@ describe('Prevent step into node (RecursiveIterator(..., ..., preventStepInto)',
     };
 
     var iterator = new RecursiveIterator(root, 0, true, preventStepInto);
-    do {
-        var item = iterator.next();
+    for(var item = iterator.next(); !item.done; item = iterator.next()) {
         var state = item.value;
         stack.push(state.node);
         stack.push(state.value);
         stack.push(state.key);
         stack.push(state.path);
-    } while(!item.done);
-
-    it('stack length is 1', function() {
-        expect(stack.length).toEqual(4);
-    });
-});
-
-
-describe('Prevent step into node (iterator.next(preventStepInto))', function() {
-    var root = {
-        object: {},
-        string: 'walker'
-    };
-    var stack = [];
-
-    var preventStepInto = function(item) {
-        var state = item.value;
-        return state.key === 'object';
-    };
-
-    var iterator = new RecursiveIterator(root);
-    do {
-        var item = iterator.next(preventStepInto);
-        var state = item.value;
-        stack.push(state.node);
-        stack.push(state.value);
-        stack.push(state.key);
-        stack.push(state.path);
-    } while(!item.done);
+    }
 
     it('stack length is 1', function() {
         expect(stack.length).toEqual(4);

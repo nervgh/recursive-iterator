@@ -14,20 +14,23 @@ class RecursiveIterator {
         this.__cache = [];
         this.__stack = [];
         this.__saveState(root, RecursiveIterator.getKeys(root), []);
+        this.__makeIterable();
     }
     /**
-     * @param {Function} [preventStepInto]
      * @returns {Object}
      */
-    next(preventStepInto = this.__preventStepInto) {
+    next() {
         var [node, keys, path] = this.__getState();
 
         var item = {
             value: {node, value, key, path},
-            done: !this.__stack.length
+            done: true
         };
 
-        if (!node) return item;
+        if (!node) {
+            this.destroy();
+            return item;
+        }
 
         var key = keys.shift();
         var value = node[key];
@@ -37,10 +40,10 @@ class RecursiveIterator {
         this.__saveState(node, keys, path);
 
         item.value = {node, value, key, path: way};
-        item.done = !this.__stack.length;
+        item.done = false;
 
         if (RecursiveIterator.isObject(value)) {
-            if (preventStepInto(item)) return this.next();
+            if (this.__preventStepInto(item)) return this.next();
 
             if (this.__cache.indexOf(value) !== -1) {
                 if (this.__ignoreCircularReferences) {
@@ -55,8 +58,6 @@ class RecursiveIterator {
             } else {
                 this.__saveState(value, RecursiveIterator.getKeys(value), way);
             }
-
-            item.done = !this.__stack.length;
         }
 
         return item;
@@ -67,6 +68,30 @@ class RecursiveIterator {
     destroy() {
         this.__stack.length = 0;
         this.__cache.length = 0;
+    }
+    /**
+     * @param {Object|Array} object
+     * @returns {Array<String>}
+     */
+    static getKeys(object) {
+        return Object.keys(object).sort();
+    }
+    /**
+     * @param {*} any
+     * @returns {Boolean}
+     */
+    static isObject(any) {
+        return any instanceof Object;
+    }
+    /**
+     * Only for es6
+     * @private
+     */
+    __makeIterable() {
+        try {
+            var __Symbol = Symbol;
+            this[__Symbol.iterator] = () => this;
+        } catch(e) {}
     }
     /**
      * @param {String} [method]
@@ -85,20 +110,6 @@ class RecursiveIterator {
      */
     __saveState(node, keys, path, method = 'push') {
         if (keys.length) this.__stack[method]([node, keys, path]);
-    }
-    /**
-     * @param {Object|Array} object
-     * @returns {Array<String>}
-     */
-    static getKeys(object) {
-        return Object.keys(object).sort();
-    }
-    /**
-     * @param {*} any
-     * @returns {Boolean}
-     */
-    static isObject(any) {
-        return any instanceof Object;
     }
 }
 

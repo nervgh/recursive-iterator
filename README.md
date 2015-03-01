@@ -1,7 +1,9 @@
 # Recursive Iterator
 
 ## About
-Iterates javascript object recursively
+Iterates javascript object recursively.
+Supports ES6 [iteration protocols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols).
+Compatible with [for...of](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/for...of) cycle.
 
 ## Required
 ES5 Object.keys(), Array.prototype.indexOf()
@@ -15,7 +17,6 @@ var iterator = new RecursiveIterator(
     [preventStepInto] /*{Function}*/
 );
 
-// See ES6 generators syntax https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/function*#Examples
 var item = iterator.next();
 var state = item.value; // descriptor state
 var done = item.done; // true if item is last in tree
@@ -37,11 +38,10 @@ var root = {
 };
 
 var iterator = new RecursiveIterator(root);
-do {
-    var item = iterator.next();
+for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
     console.log(state.path.join('.'), state.value);
-} while(!item.done);
+}
 
 // object    Object {number: 1}
 // object.number    1
@@ -56,12 +56,10 @@ var root = {
     string: 'foo'
 };
 
-var iterator = new RecursiveIterator(root, 1);
-do {
-    var item = iterator.next();
+for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
     console.log(state.path.join('.'), state.value);
-} while(!item.done);
+}
 
 // object    Object {number: 1}
 // string    foo
@@ -79,11 +77,10 @@ var root = {
 root.object = root;
 
 var iterator = new RecursiveIterator(root);
-do {
-    var item = iterator.next();
+for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
     console.log(state.path.join('.'), state.value);
-} while(!item.done);
+}
 
 // number    1
 // Uncaught Error: Circular reference
@@ -98,11 +95,10 @@ var root = {
 root.object = root;
 
 var iterator = new RecursiveIterator(root, 0, true);
-do {
-    var item = iterator.next();
+for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
     console.log(state.path.join('.'), state.value);
-} while(!item.done);
+}
 
 // number    1
 // string    foo
@@ -111,18 +107,43 @@ do {
 ## Prevent step into node
 For preventing bypass object you can use `preventStepInto` argument:
 ```js
+var root = {
+    object: {
+        number: 1
+    },
+    string: 'foo'
+};
+
 var preventStepInto = function(item) {
     return item.value.key === 'object'; // if true then item.value.value will be skipped
 };
 
 var iterator = new RecursiveIterator(root, 0, false, preventStepInto);
-```
-Alternative syntax:
-```js
-var preventStepInto = function(item) {
-    return item.value.key === 'object'; // if true then item.value.value will be skipped
-};
-var iterator = new RecursiveIterator(root);
-iterator.next(preventStepInto);
+for(var item = iterator.next(); !item.done; item = iterator.next()) {
+    var state = item.value;
+    console.log(state.path.join('.'), state.value);
+}
+
+// string    foo
 ```
 When you usage this feature you must be careful because `node` and `key` may be `undefined`.
+
+## ES6 example: **for...of** loop
+```js
+var root = {
+    object: {
+        number: 1
+    },
+    string: 'foo'
+};
+
+for(let {node, value, key, path} of new RecursiveIterator(root)) {
+    console.log(node, value, key, path);
+}
+
+// or
+
+for(let item of new RecursiveIterator(root)) {
+    console.log(item);
+}
+```
