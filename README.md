@@ -131,7 +131,7 @@ for(var item = iterator.next(); !item.done; item = iterator.next()) {
 ## Methods
 
 ### next()
-Returns next [state object](https://github.com/nervgh/recursive-iterator#syntax) or `undefined`.
+Returns the state described of [iteration protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol).
 
 ### isLeaf(node)
 Returns `true` if node is leaf.
