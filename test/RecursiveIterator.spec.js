@@ -15,6 +15,190 @@ describe('RecursiveIterator returns instance of RecursiveIterator', function() {
 });
 
 
+describe('Actual iteration should return the object of the specified type', function() {
+    var root = {
+        object: {
+            number: 1
+        },
+        string: 'walker'
+    };
+
+    var iterator = new RecursiveIterator(root);
+    var state = iterator.next().value;
+
+    it('it object must have "parent" property', function() {
+        expect(state.hasOwnProperty('parent')).toBeTruthy();
+    });
+    it('it object must have "node" property', function() {
+        expect(state.hasOwnProperty('node')).toBeTruthy();
+    });
+    it('it object must have "key" property', function() {
+        expect(state.hasOwnProperty('key')).toBeTruthy();
+    });
+    it('it object must have "path" property', function() {
+        expect(state.hasOwnProperty('path')).toBeTruthy();
+    });
+    it('it object must have "deep" property', function() {
+        expect(state.hasOwnProperty('deep')).toBeTruthy();
+    });
+});
+
+
+describe('The end of the iteration', function() {
+    var root = {
+        object: {
+            number: 1
+        },
+        string: 'walker'
+    };
+
+    var iterator = new RecursiveIterator(root);
+    iterator.next();
+    iterator.next();
+    iterator.next();
+    iterator.next();
+
+    it('item.value must undefined', function() {
+        expect(iterator.next().value).toBeUndefined();
+    });
+    it('item.done must true', function() {
+        expect(iterator.next().done).toBe(true);
+    });
+});
+
+
+describe('Do not iterate over objects if it keys.length === 0', function() {
+    var root = new Date();
+    var queue = [];
+
+    var iterator = new RecursiveIterator(root);
+    for(var item = iterator.next(); !item.done; item = iterator.next()) {
+        var state = item.value;
+        queue.push(state.parent);
+        queue.push(state.node);
+        queue.push(state.key);
+        queue.push(state.path);
+        queue.push(state.deep);
+    }
+
+    it('queue.length must be 0', function() {
+        expect(queue.length).toEqual(0);
+    });
+});
+
+
+describe('Testing of destroy() method', function() {
+    var root = {
+        object: {
+            number: 1
+        },
+        string: 'walker'
+    };
+
+    it('After call of iterator.destroy() item.value === undefined', function() {
+        var iterator = new RecursiveIterator(root);
+        iterator.next();
+        expect(iterator.next().value).toBeDefined();
+        iterator.destroy();
+        expect(iterator.next().value).toBeUndefined();
+        expect(iterator.next().value).toBeUndefined();
+    });
+    it('After call of iterator.destroy() item.done === true', function() {
+        var iterator = new RecursiveIterator(root);
+        iterator.next();
+        expect(iterator.next().done).toBeFalsy();
+        iterator.destroy();
+        expect(iterator.next().done).toBeTruthy();
+        expect(iterator.next().done).toBeTruthy();
+    });
+});
+
+
+describe('Testing of isLeaf() method', function() {
+    var root = {
+        date: new Date(),
+        object: {
+            number: 1
+        },
+        string: 'walker'
+    };
+
+    var iterator = new RecursiveIterator(root);
+
+    it('Leaf is objects whose keys.length === 0', function() {
+        expect(iterator.isLeaf(iterator.next().value.node)).toBeTruthy(); // date
+    });
+    it('Leaf is all primitive types', function() {
+        expect(iterator.isLeaf(iterator.next().value.node)).toBeFalsy(); // object
+        expect(iterator.isLeaf(iterator.next().value.node)).toBeTruthy(); // object.number
+        expect(iterator.isLeaf(iterator.next().value.node)).toBeTruthy(); // string
+    });
+});
+
+
+describe('Testing of isCircular() method', function() {
+    var root = {
+        array: [],
+        object: undefined,
+        string: 'walker'
+    };
+    root.object = root;
+
+    var iterator = new RecursiveIterator(root, 0, true);
+
+    it('isCircular() returns "true" if object is circular reference', function() {
+        expect(iterator.isCircular(iterator.next().value.node)).toBeFalsy();
+        expect(iterator.isCircular(iterator.next().value.node)).toBeTruthy();
+        expect(iterator.isCircular(iterator.next().value.node)).toBeFalsy();
+    });
+});
+
+
+describe('Testing of onStepInto() callback', function() {
+    it('Calls for each object', function() {
+        var root = {
+            date: new Date(),
+            object: {
+                number: 1
+            },
+            string: 'walker'
+        };
+
+        var iterator = new RecursiveIterator(root);
+        var queue = [];
+        iterator.onStepInto = function(object) {
+            queue.push(object);
+            return true;
+        };
+        for(var item = iterator.next(); !item.done; item = iterator.next()) {
+            // empty body
+        }
+
+        expect(queue.length).toEqual(2);
+    });
+    it('If returns "false" node will be skipped', function() {
+        var root = {
+            date: new Date(),
+            object: {
+                number: 1
+            },
+            string: 'walker'
+        };
+
+        var iterator = new RecursiveIterator(root);
+        var queue = [];
+        iterator.onStepInto = function(object) {
+            return false;
+        };
+        for(var item = iterator.next(); !item.done; item = iterator.next()) {
+            queue.push(true);
+        }
+
+        expect(queue.length).toEqual(3);
+    });
+});
+
+
 describe('Vertical bypass method (bypassMode = 0)', function() {
     var root = {
         object: {
@@ -22,34 +206,38 @@ describe('Vertical bypass method (bypassMode = 0)', function() {
         },
         string: 'walker'
     };
-    var stack = [];
+    var queue = [];
 
     var iterator = new RecursiveIterator(root);
     for(var item = iterator.next(); !item.done; item = iterator.next()) {
         var state = item.value;
-        stack.push(state.node);
-        stack.push(state.value);
-        stack.push(state.key);
-        stack.push(state.path);
+        queue.push(state.parent);
+        queue.push(state.node);
+        queue.push(state.key);
+        queue.push(state.path);
+        queue.push(state.deep);
     }
 
-    it('foo [node, value, key, path]', function() {
-        expect(stack.shift()).toBe(root);
-        expect(stack.shift()).toBe(root.object);
-        expect(stack.shift()).toBe('object');
-        expect(stack.shift().join('.')).toBe('object');
+    it('foo [parent, node, key, path, deep]', function() {
+        expect(queue.shift()).toBe(root);
+        expect(queue.shift()).toBe(root.object);
+        expect(queue.shift()).toBe('object');
+        expect(queue.shift().join('.')).toBe('object');
+        expect(queue.shift()).toBe(1);
     });
-    it('foo.bar [node, value, key, path]', function() {
-        expect(stack.shift()).toBe(root.object);
-        expect(stack.shift()).toBe(root.object.number);
-        expect(stack.shift()).toBe('number');
-        expect(stack.shift().join('.')).toBe('object.number');
+    it('foo.bar [parent, node, key, path, deep]', function() {
+        expect(queue.shift()).toBe(root.object);
+        expect(queue.shift()).toBe(root.object.number);
+        expect(queue.shift()).toBe('number');
+        expect(queue.shift().join('.')).toBe('object.number');
+        expect(queue.shift()).toBe(2);
     });
-    it('foo.bar.number [node, value, key, path]', function() {
-        expect(stack.shift()).toBe(root);
-        expect(stack.shift()).toBe(root.string);
-        expect(stack.shift()).toBe('string');
-        expect(stack.shift().join('.')).toBe('string');
+    it('foo.bar.number [parent, node, key, path, deep]', function() {
+        expect(queue.shift()).toBe(root);
+        expect(queue.shift()).toBe(root.string);
+        expect(queue.shift()).toBe('string');
+        expect(queue.shift().join('.')).toBe('string');
+        expect(queue.shift()).toBe(1);
     });
 });
 
@@ -61,34 +249,38 @@ describe('Horizontal bypass method (bypassMode = 1)', function() {
         },
         string: 'walker'
     };
-    var stack = [];
+    var queue = [];
 
     var iterator = new RecursiveIterator(root, 1);
     for(var item = iterator.next(); !item.done; item = iterator.next()) {
         var state = item.value;
-        stack.push(state.node);
-        stack.push(state.value);
-        stack.push(state.key);
-        stack.push(state.path);
+        queue.push(state.parent);
+        queue.push(state.node);
+        queue.push(state.key);
+        queue.push(state.path);
+        queue.push(state.deep);
     }
 
-    it('foo [node, value, key, path]', function() {
-        expect(stack.shift()).toBe(root);
-        expect(stack.shift()).toBe(root.object);
-        expect(stack.shift()).toBe('object');
-        expect(stack.shift().join('.')).toBe('object');
+    it('foo [parent, node, key, path, deep]', function() {
+        expect(queue.shift()).toBe(root);
+        expect(queue.shift()).toBe(root.object);
+        expect(queue.shift()).toBe('object');
+        expect(queue.shift().join('.')).toBe('object');
+        expect(queue.shift()).toBe(1);
     });
-    it('foo.bar [node, value, key, path]', function() {
-        expect(stack.shift()).toBe(root);
-        expect(stack.shift()).toBe(root.string);
-        expect(stack.shift()).toBe('string');
-        expect(stack.shift().join('.')).toBe('string');
+    it('foo.bar [parent, node, key, path, deep]', function() {
+        expect(queue.shift()).toBe(root);
+        expect(queue.shift()).toBe(root.string);
+        expect(queue.shift()).toBe('string');
+        expect(queue.shift().join('.')).toBe('string');
+        expect(queue.shift()).toBe(1);
     });
-    it('foo.string [node, value, key, path]', function() {
-        expect(stack.shift()).toBe(root.object);
-        expect(stack.shift()).toBe(root.object.number);
-        expect(stack.shift()).toBe('number');
-        expect(stack.shift().join('.')).toBe('object.number');
+    it('foo.string [parent, node, key, path, deep]', function() {
+        expect(queue.shift()).toBe(root.object);
+        expect(queue.shift()).toBe(root.object.number);
+        expect(queue.shift()).toBe('number');
+        expect(queue.shift().join('.')).toBe('object.number');
+        expect(queue.shift()).toBe(2);
     });
 });
 
@@ -99,24 +291,27 @@ describe('Circular references (exception)', function() {
         string: 'walker'
     };
     root.object = root;
-    var stack = [];
+    var queue = [];
 
     try {
         var iterator = new RecursiveIterator(root);
         for(var item = iterator.next(); !item.done; item = iterator.next()) {
             var state = item.value;
-            stack.push(state.node);
-            stack.push(state.value);
-            stack.push(state.key);
-            stack.push(state.path);
+            queue.push(state.parent);
+            queue.push(state.node);
+            queue.push(state.key);
+            queue.push(state.path);
+            queue.push(state.deep);
         }
     } catch (e) {
         var error = e;
     }
 
     it('if detected circular reference then will throw an exception', function() {
-        expect(stack.length).toEqual(0);
         expect(error instanceof Error).toBe(true);
+    });
+    it('if a circular reference refers to root', function() {
+        expect(queue.length).toEqual(5);
     });
 });
 
@@ -127,50 +322,51 @@ describe('Circular references (ignore)', function() {
         string: 'walker'
     };
     root.object = root;
-    var stack = [];
+    var queue = [];
 
     try {
         var iterator = new RecursiveIterator(root, 0, true);
         for(var item = iterator.next(); !item.done; item = iterator.next()) {
             var state = item.value;
-            stack.push(state.node);
-            stack.push(state.value);
-            stack.push(state.key);
-            stack.push(state.path);
+            queue.push(state.parent);
+            queue.push(state.node);
+            queue.push(state.key);
+            queue.push(state.path);
+            queue.push(state.deep);
         }
     } catch (e) {
         var error = e;
     }
 
-    it('ignoreCircularReferences=true', function() {
-        expect(stack.length).toEqual(4);
+    it('ignoreCircular=true', function() {
         expect(error instanceof Error).toBe(false);
+    });
+    it('if a circular reference refers to root', function() {
+        expect(queue.length).toEqual(10);
     });
 });
 
 
-describe('Prevent step into node (RecursiveIterator(..., ..., preventStepInto)', function() {
+describe('Max deep', function() {
     var root = {
-        object: {},
+        object: {
+            number: 1
+        },
         string: 'walker'
     };
-    var stack = [];
+    var queue = [];
 
-    var preventStepInto = function(item) {
-        var state = item.value;
-        return state.key === 'object';
-    };
-
-    var iterator = new RecursiveIterator(root, 0, true, preventStepInto);
+    var iterator = new RecursiveIterator(root, 0, false, 1);
     for(var item = iterator.next(); !item.done; item = iterator.next()) {
         var state = item.value;
-        stack.push(state.node);
-        stack.push(state.value);
-        stack.push(state.key);
-        stack.push(state.path);
+        queue.push(state.parent);
+        queue.push(state.node);
+        queue.push(state.key);
+        queue.push(state.path);
+        queue.push(state.deep);
     }
 
-    it('stack length is 1', function() {
-        expect(stack.length).toEqual(4);
+    it('maxDeep=1', function() {
+        expect(queue.length).toEqual(10);
     });
 });

@@ -1,6 +1,6 @@
 {
     "name": "recursive-iterator",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "description": "Iterates javascript object recursively",
     "homepage": "https://github.com/nervgh/recursive-iterator",
     "repository": "https://github.com/nervgh/recursive-iterator",

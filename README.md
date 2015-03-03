@@ -14,18 +14,19 @@ ES5 Object.keys(), Array.prototype.indexOf()
 var iterator = new RecursiveIterator(
     root /*{Object|Array}*/,
     [bypassMode=0] /*{Number}*/,
-    [ignoreCircularReferences=false] /*{Boolean}*/,
-    [preventStepInto] /*{Function}*/
+    [ignoreCircular=false] /*{Boolean}*/,
+    [maxDeep=100] /*{Number}*/
 );
 
 var item = iterator.next();
-var state = item.value; // descriptor state
-var done = item.done; // true if item is last in tree
+var state = item.value; // descriptor of state
+var done = item.done; // true if end of the loop
 
-var node = state.node; // node is current node
-var value = state.value; // value is node[key] value
-var key = state.key; // key is key of node
-var path = state.path; // path is path to node
+var parent = state.parent; // parent object
+var node = state.node; // current node
+var key = state.key; // key of node
+var path = state.path; // path to node
+var deep = state.deep; // current deep
 ```
 
 ## Tree traverse methods
@@ -86,7 +87,7 @@ for(var item = iterator.next(); !item.done; item = iterator.next()) {
 // number    1
 // Uncaught Error: Circular reference
 ```
-You can change this behaviour by passing `ignoreCircularReferences=true`:
+You can change this behaviour by passing `ignoreCircular=true`:
 ```js
 var root = {
     number: 1,
@@ -105,8 +106,10 @@ for(var item = iterator.next(); !item.done; item = iterator.next()) {
 // string    foo
 ```
 
-## Prevent step into node
-For preventing bypass object you can use `preventStepInto` argument:
+## Max deep
+You can control the depth of dives of the iterator.
+By default `maxDeep`is `100`. Minimum depth is `1`.
+Each like cycle:
 ```js
 var root = {
     object: {
@@ -115,19 +118,69 @@ var root = {
     string: 'foo'
 };
 
-var preventStepInto = function(item) {
-    return item.value.key === 'object'; // if true then item.value.value will be skipped
-};
-
-var iterator = new RecursiveIterator(root, 0, false, preventStepInto);
+var iterator = new RecursiveIterator(root, 0, false, 1);
 for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
     console.log(state.path.join('.'), state.value);
 }
 
+// object    Object {number: 1}
 // string    foo
 ```
-When you usage this feature you must be careful because `node` and `key` may be `undefined`.
+
+## Methods
+
+### next()
+Returns next [state object](https://github.com/nervgh/recursive-iterator#syntax) or `undefined`.
+
+### isLeaf(node)
+Returns `true` if node is leaf.
+Leaf is all primitive types and objects whose `keys.length === 0`.
+```js
+var iterator = new RecursiveIterator(root);
+var item = iterator.next();
+
+iterator.isLeaf(item.node);
+```
+
+### isCircular(object)
+Returns `true` if object is circular reference.
+```js
+var iterator = new RecursiveIterator(root);
+var item = iterator.next();
+
+iterator.isCircular(item.node);
+```
+
+### destroy()
+Clears the cache and queue. It calls automatically at the end of the loop.
+
+## Callbacks
+
+### onStepInto(object)
+It calls for each object. If returns `false` object will be skipped:
+```js
+var root = {
+    object: {
+        number: 1
+    },
+    string: 'foo'
+};
+
+var iterator = new RecursiveIterator(root);
+iterator.onStepInto = function(object) {
+    // prevent step into object
+    return false;
+};
+
+for(var item = iterator.next(); !item.done; item = iterator.next()) {
+    var state = item.value;
+    console.log(state.path.join('.'), state.value);
+}
+
+// object    Object {number: 1}
+// string    foo
+```
 
 ## ES6 example: **for...of** loop
 ```js
@@ -138,13 +191,19 @@ var root = {
     string: 'foo'
 };
 
-for(let {node, value, key, path} of new RecursiveIterator(root)) {
-    console.log(node, value, key, path);
+for(let item of new RecursiveIterator(root)) {
+    console.log(item.path.join('.'), item.node);
 }
 
 // or
 
-for(let item of new RecursiveIterator(root)) {
-    console.log(item);
+for(let {parent, node, key, path, deep} of new RecursiveIterator(root)) {
+    console.log(path.join('.'), node);
+}
+
+// or
+
+for(let {node, path} of new RecursiveIterator(root, 1)) {
+    console.log(path.join('.'), node);
 }
 ```

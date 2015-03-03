@@ -1,7 +1,7 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define('recursive-iterator', [], function () {
+    define('RecursiveIterator', [], function () {
       return (root['RecursiveIterator'] = factory());
     });
   } else if (typeof exports === 'object') {
@@ -16,39 +16,37 @@
 
 "use strict";
 
-var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
+var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var RecursiveIterator = (function () {
+var Iterator = (function () {
     /**
      * @param {Object|Array} root
      * @param {Number} [bypassMode=0]
-     * @param {Boolean} [ignoreCircularReferences=false]
-     * @param {Function} [preventStepInto]
+     * @param {Boolean} [ignoreCircular=false]
+     * @param {Number} [maxDeep=100]
      */
 
-    function RecursiveIterator(root) {
+    function Iterator(root) {
         var bypassMode = arguments[1] === undefined ? 0 : arguments[1];
-        var ignoreCircularReferences = arguments[2] === undefined ? false : arguments[2];
-        var preventStepInto = arguments[3] === undefined ? function () {
-            return false;
-        } : arguments[3];
+        var ignoreCircular = arguments[2] === undefined ? false : arguments[2];
+        var maxDeep = arguments[3] === undefined ? 100 : arguments[3];
 
-        _classCallCheck(this, RecursiveIterator);
+        _classCallCheck(this, Iterator);
 
         this.__bypassMode = bypassMode;
-        this.__ignoreCircularReferences = ignoreCircularReferences;
-        this.__preventStepInto = preventStepInto;
-        this.__cache = [];
-        this.__stack = [];
-        this.__saveState(root, RecursiveIterator.getKeys(root), []);
+        this.__ignoreCircular = ignoreCircular;
+        this.__maxDeep = maxDeep;
+        this.__queue = [].concat(_toConsumableArray(Iterator.getChildNodes(root, [], 0)));
+        this.__node = Iterator.getNode();
+        this.__cache = [root];
         this.__makeIterable();
     }
 
-    _prototypeProperties(RecursiveIterator, {
+    _prototypeProperties(Iterator, {
         getKeys: {
             /**
              * @param {Object|Array} object
@@ -72,6 +70,43 @@ var RecursiveIterator = (function () {
             },
             writable: true,
             configurable: true
+        },
+        getChildNodes: {
+            /**
+             * @param {Object|Array} object
+             * @param {Array} path
+             * @param {Number} deep
+             * @returns {Array}
+             * @private
+             */
+
+            value: function getChildNodes(object, path, deep) {
+                return Iterator.getKeys(object).map(function (key) {
+                    return Iterator.getNode(object, object[key], key, path.concat(key), deep + 1);
+                });
+            },
+            writable: true,
+            configurable: true
+        },
+        getNode: {
+            /**
+             * @param {Object} [parent]
+             * @param {*} [node]
+             * @param {String} [key]
+             * @param {Array} [path]
+             * @param {Number} [deep]
+             * @returns {Object}
+             * @private
+             */
+
+            value: function getNode(parent, node, key) {
+                var path = arguments[3] === undefined ? [] : arguments[3];
+                var deep = arguments[4] === undefined ? 0 : arguments[4];
+
+                return { parent: parent, node: node, key: key, path: path, deep: deep };
+            },
+            writable: true,
+            configurable: true
         }
     }, {
         next: {
@@ -80,53 +115,38 @@ var RecursiveIterator = (function () {
              */
 
             value: function next() {
-                var _getState = this.__getState();
+                var any = this.__node && this.__node.node;
+                var path = this.__node && this.__node.path;
+                var deep = this.__node && this.__node.deep;
 
-                var _getState2 = _slicedToArray(_getState, 3);
-
-                var node = _getState2[0];
-                var keys = _getState2[1];
-                var path = _getState2[2];
-
-                var item = {
-                    value: { node: node, value: value, key: key, path: path },
-                    done: true
-                };
-
-                if (!node) {
-                    this.destroy();
-                    return item;
-                }
-
-                var key = keys.shift();
-                var value = node[key];
-                var way = path.concat(key);
-
-                this.__cache.push(node);
-                this.__saveState(node, keys, path);
-
-                item.value = { node: node, value: value, key: key, path: way };
-                item.done = false;
-
-                if (RecursiveIterator.isObject(value)) {
-                    if (this.__preventStepInto(item)) {
-                        return this.next();
-                    }if (this.__cache.indexOf(value) !== -1) {
-                        if (this.__ignoreCircularReferences) {
-                            return this.next();
-                        } else {
+                if (this.__maxDeep > deep && Iterator.isObject(any)) {
+                    if (this.isCircular(any)) {
+                        if (this.__ignoreCircular) {} else {
                             throw new Error("Circular reference");
                         }
-                    }
-
-                    if (this.__bypassMode) {
-                        this.__saveState(value, RecursiveIterator.getKeys(value), way, "unshift");
                     } else {
-                        this.__saveState(value, RecursiveIterator.getKeys(value), way);
+                        if (this.onStepInto(any)) {
+                            if (this.__bypassMode) {
+                                var _queue;
+
+                                (_queue = this.__queue).push.apply(_queue, _toConsumableArray(Iterator.getChildNodes(any, path, deep)));
+                            } else {
+                                var _queue2;
+
+                                (_queue2 = this.__queue).unshift.apply(_queue2, _toConsumableArray(Iterator.getChildNodes(any, path, deep)));
+                            }
+                            this.__cache.push(any);
+                        }
                     }
                 }
 
-                return item;
+                this.__node = this.__queue.shift();
+                if (!this.__node) this.destroy();
+
+                return {
+                    value: this.__node,
+                    done: !this.__node
+                };
             },
             writable: true,
             configurable: true
@@ -137,8 +157,49 @@ var RecursiveIterator = (function () {
              */
 
             value: function destroy() {
-                this.__stack.length = 0;
+                this.__queue.length = 0;
                 this.__cache.length = 0;
+                this.__node = undefined;
+            },
+            writable: true,
+            configurable: true
+        },
+        isLeaf: {
+            /**
+             * @param {*} any
+             * @returns {Boolean}
+             */
+
+            value: function isLeaf(any) {
+                if (!Iterator.isObject(any)) {
+                    return true;
+                }var keys = Iterator.getKeys(any);
+                return !keys.length;
+            },
+            writable: true,
+            configurable: true
+        },
+        isCircular: {
+            /**
+             * @param {*} any
+             * @returns {Boolean}
+             */
+
+            value: function isCircular(any) {
+                return this.__cache.indexOf(any) !== -1;
+            },
+            writable: true,
+            configurable: true
+        },
+        onStepInto: {
+            /**
+             * Callback
+             * @param {Object} object
+             * @returns {Boolean}
+             */
+
+            value: function onStepInto(object) {
+                return true;
             },
             writable: true,
             configurable: true
@@ -153,53 +214,25 @@ var RecursiveIterator = (function () {
                 var _this = this;
 
                 try {
-                    var __Symbol = Symbol;
-                    this[__Symbol.iterator] = function () {
+                    this[Symbol.iterator] = function () {
                         return _this;
                     };
                 } catch (e) {}
             },
             writable: true,
             configurable: true
-        },
-        __getState: {
-            /**
-             * @param {String} [method]
-             * @returns {Array}
-             * @private
-             */
-
-            value: function __getState() {
-                var method = arguments[0] === undefined ? "pop" : arguments[0];
-
-                return this.__stack[method]() || [undefined, undefined, []];
-            },
-            writable: true,
-            configurable: true
-        },
-        __saveState: {
-            /**
-             * @param {Object|Array} node
-             * @param {Array} keys
-             * @param {Array} path
-             * @param {String} [method]
-             * @private
-             */
-
-            value: function __saveState(node, keys, path) {
-                var method = arguments[3] === undefined ? "push" : arguments[3];
-
-                if (keys.length) this.__stack[method]([node, keys, path]);
-            },
-            writable: true,
-            configurable: true
         }
     });
 
-    return RecursiveIterator;
+    return Iterator;
 })();
 
-//export default RecursiveIterator;
+//export default Iterator;
+
+// necessary for correct assembly
+var RecursiveIterator = Iterator;
+
+// skip
 return RecursiveIterator;
 
 }));

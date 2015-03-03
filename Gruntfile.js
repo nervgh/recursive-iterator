@@ -50,7 +50,7 @@ module.exports = function(grunt) {
                 dest: 'dist/recursive-iterator.umd.js',
                 objectToExport: 'RecursiveIterator',
                 globalAlias: 'RecursiveIterator',
-                amdModuleId: '<%= pkg.name %>',
+                amdModuleId: 'RecursiveIterator',
                 indent: 4
             }
         },
