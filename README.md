@@ -42,7 +42,7 @@ var root = {
 var iterator = new RecursiveIterator(root);
 for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
-    console.log(state.path.join('.'), state.value);
+    console.log(state.path.join('.'), state.node);
 }
 
 // object    Object {number: 1}
@@ -60,7 +60,7 @@ var root = {
 
 for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
-    console.log(state.path.join('.'), state.value);
+    console.log(state.path.join('.'), state.node);
 }
 
 // object    Object {number: 1}
@@ -81,7 +81,7 @@ root.object = root;
 var iterator = new RecursiveIterator(root);
 for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
-    console.log(state.path.join('.'), state.value);
+    console.log(state.path.join('.'), state.node);
 }
 
 // number    1
@@ -99,7 +99,7 @@ root.object = root;
 var iterator = new RecursiveIterator(root, 0, true);
 for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
-    console.log(state.path.join('.'), state.value);
+    console.log(state.path.join('.'), state.node);
 }
 
 // number    1
@@ -121,7 +121,7 @@ var root = {
 var iterator = new RecursiveIterator(root, 0, false, 1);
 for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
-    console.log(state.path.join('.'), state.value);
+    console.log(state.path.join('.'), state.node);
 }
 
 // object    Object {number: 1}
@@ -175,7 +175,7 @@ iterator.onStepInto = function(object) {
 
 for(var item = iterator.next(); !item.done; item = iterator.next()) {
     var state = item.value;
-    console.log(state.path.join('.'), state.value);
+    console.log(state.path.join('.'), state.node);
 }
 
 // object    Object {number: 1}
