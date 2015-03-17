@@ -7,7 +7,7 @@ Supports ES6 [iteration protocols](https://developer.mozilla.org/en-US/docs/Web/
 Compatible with [for...of](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/for...of) cycle.
 
 ## Required
-ES5 Object.keys(), Array.prototype.indexOf()
+ES5
 
 ## Syntax
 ```js
@@ -182,7 +182,8 @@ for(var item = iterator.next(); !item.done; item = iterator.next()) {
 // string    foo
 ```
 
-## ES6 example: **for...of** loop
+## ES6 examples
+### for...of loop
 ```js
 var root = {
     object: {
@@ -206,4 +207,83 @@ for(let {parent, node, key, path, deep} of new RecursiveIterator(root)) {
 for(let {node, path} of new RecursiveIterator(root, 1)) {
     console.log(path.join('.'), node);
 }
+```
+### Deep copying ([es5 sandbox](http://jsfiddle.net/929906h3/))
+```js
+var toString = Object.prototype.toString;
+var isObject = RecursiveIterator.isObject;
+
+/**
+ * @param {*} any
+ * @returns {String}
+ */
+function getType(any) {
+    return toString.call(any).slice(8, -1);
+}
+
+/**
+ * @param {*} any
+ * @returns {*}
+ */
+function shallowCopy(any) {
+    var type = getType(any);
+    switch (type) {
+        case 'Object':
+            return {};
+        case 'Array':
+            return [];
+        case 'Date':
+            return new Date(any);
+        case 'RegExp':
+            return new RegExp(any);
+        case 'Number':
+        case 'String':
+        case 'Boolean':
+        case 'Undefined':
+        case 'Null':
+            return any;
+        default:
+            return any.toString();
+    }
+}
+
+/**
+ * @param {*} any
+ * @param {Boolean} [deep]
+ * @returns {*}
+ */
+function copy(any, deep = false) {
+    if (!deep || !isObject(any)) {
+        return shallowCopy(any);
+    }
+
+    var map = new Map();
+    var rootNode = shallowCopy(any);
+    map.set(any, rootNode);
+
+    for(var {parent, node, key} of new RecursiveIterator(any, 1, true)) {
+        var parentNode = map.get(parent);
+        var cloneNode = shallowCopy(node);
+        parentNode[key] = cloneNode;
+        map.set(node, cloneNode);
+    }
+
+    map.clear();
+
+    return rootNode;
+}
+
+// ---------------------------------
+// USAGE
+// ---------------------------------
+
+var some = {
+    foo: {
+        bar: 1
+    }
+};
+
+var clone = copy(some, true);
+alert(JSON.stringify(clone));
+alert(clone === some);
 ```
