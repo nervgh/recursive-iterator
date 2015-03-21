@@ -115,37 +115,44 @@ var Iterator = (function () {
              */
 
             value: function next() {
-                var any = this.__node && this.__node.node;
-                var path = this.__node && this.__node.path;
-                var deep = this.__node && this.__node.deep;
+                var _ref = this.__node || {};
 
-                if (this.__maxDeep > deep && Iterator.isObject(any)) {
-                    if (this.isCircular(any)) {
+                var node = _ref.node;
+                var path = _ref.path;
+                var deep = _ref.deep;
+
+                if (this.__maxDeep > deep && Iterator.isObject(node)) {
+                    if (this.isCircular(node)) {
                         if (this.__ignoreCircular) {} else {
                             throw new Error("Circular reference");
                         }
                     } else {
-                        if (this.onStepInto(any)) {
+                        if (this.onStepInto(node)) {
+                            var childNodes = Iterator.getChildNodes(node, path, deep);
                             if (this.__bypassMode) {
                                 var _queue;
 
-                                (_queue = this.__queue).push.apply(_queue, _toConsumableArray(Iterator.getChildNodes(any, path, deep)));
+                                (_queue = this.__queue).push.apply(_queue, _toConsumableArray(childNodes));
                             } else {
                                 var _queue2;
 
-                                (_queue2 = this.__queue).unshift.apply(_queue2, _toConsumableArray(Iterator.getChildNodes(any, path, deep)));
+                                (_queue2 = this.__queue).unshift.apply(_queue2, _toConsumableArray(childNodes));
                             }
-                            this.__cache.push(any);
+                            this.__cache.push(node);
                         }
                     }
                 }
 
-                this.__node = this.__queue.shift();
-                if (!this.__node) this.destroy();
+                var value = this.__queue.shift();
+                var done = !value;
+
+                this.__node = value;
+
+                if (done) this.destroy();
 
                 return {
-                    value: this.__node,
-                    done: !this.__node
+                    value: value,
+                    done: done
                 };
             },
             writable: true,
@@ -159,7 +166,7 @@ var Iterator = (function () {
             value: function destroy() {
                 this.__queue.length = 0;
                 this.__cache.length = 0;
-                this.__node = undefined;
+                this.__node = null;
             },
             writable: true,
             configurable: true

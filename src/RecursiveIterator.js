@@ -20,35 +20,38 @@ class Iterator {
      * @returns {Object}
      */
     next() {
-        var any = this.__node && this.__node.node;
-        var path = this.__node && this.__node.path;
-        var deep = this.__node && this.__node.deep;
+        var {node, path, deep} = this.__node || {};
 
-        if (this.__maxDeep > deep && Iterator.isObject(any)) {
-            if (this.isCircular(any)) {
+        if (this.__maxDeep > deep && Iterator.isObject(node)) {
+            if (this.isCircular(node)) {
                 if (this.__ignoreCircular) {
                     // skip
                 } else {
                     throw new Error('Circular reference');
                 }
             } else {
-                if (this.onStepInto(any)) {
+                if (this.onStepInto(node)) {
+                    var childNodes = Iterator.getChildNodes(node, path, deep);
                     if (this.__bypassMode) {
-                        this.__queue.push(...Iterator.getChildNodes(any, path, deep));
+                        this.__queue.push(...childNodes);
                     } else {
-                        this.__queue.unshift(...Iterator.getChildNodes(any, path, deep));
+                        this.__queue.unshift(...childNodes);
                     }
-                    this.__cache.push(any);
+                    this.__cache.push(node);
                 }
             }
         }
 
-        this.__node = this.__queue.shift();
-        if (!this.__node) this.destroy();
+        var value = this.__queue.shift();
+        var done = !value;
+
+        this.__node = value;
+
+        if (done) this.destroy();
 
         return {
-            value: this.__node,
-            done: !this.__node
+            value,
+            done
         };
     }
     /**
@@ -57,7 +60,7 @@ class Iterator {
     destroy() {
         this.__queue.length = 0;
         this.__cache.length = 0;
-        this.__node = undefined;
+        this.__node = null;
     }
     /**
      * @param {*} any
