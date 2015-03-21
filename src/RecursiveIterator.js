@@ -91,7 +91,11 @@ class Iterator {
      * @returns {Array<String>}
      */
     static getKeys(object) {
-        return Object.keys(object).sort();
+        var keys = Object.keys(object).sort();
+        if (!Array.isArray(object) && Iterator.isArrayLike(object)) {
+            keys = keys.filter((key) => Math.floor(Number(key)) == key);
+        }
+        return keys;
     }
     /**
      * @param {*} any
@@ -99,6 +103,20 @@ class Iterator {
      */
     static isObject(any) {
         return any instanceof Object;
+    }
+    /**
+     * @param {Object} object
+     * @returns {Boolean}
+     */
+    static isWindow(object) {
+        return object === object.window;
+    }
+    /**
+     * @param {Object} object
+     * @returns {Boolean}
+     */
+    static isArrayLike(object) {
+        return !Iterator.isWindow(object) && object.hasOwnProperty('length');
     }
     /**
      * @param {Object|Array} object

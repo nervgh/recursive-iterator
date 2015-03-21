@@ -1,6 +1,6 @@
 {
     "name": "recursive-iterator",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Iterates javascript object recursively. Supports ES6 iteration protocols.",
     "homepage": "https://github.com/nervgh/recursive-iterator",
     "license": "MIT",

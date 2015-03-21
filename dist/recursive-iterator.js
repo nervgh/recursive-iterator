@@ -54,7 +54,13 @@ var Iterator = (function () {
              */
 
             value: function getKeys(object) {
-                return Object.keys(object).sort();
+                var keys = Object.keys(object).sort();
+                if (!Array.isArray(object) && Iterator.isArrayLike(object)) {
+                    keys = keys.filter(function (key) {
+                        return Math.floor(Number(key)) == key;
+                    });
+                }
+                return keys;
             },
             writable: true,
             configurable: true
@@ -67,6 +73,30 @@ var Iterator = (function () {
 
             value: function isObject(any) {
                 return any instanceof Object;
+            },
+            writable: true,
+            configurable: true
+        },
+        isWindow: {
+            /**
+             * @param {Object} object
+             * @returns {Boolean}
+             */
+
+            value: function isWindow(object) {
+                return object === object.window;
+            },
+            writable: true,
+            configurable: true
+        },
+        isArrayLike: {
+            /**
+             * @param {Object} object
+             * @returns {Boolean}
+             */
+
+            value: function isArrayLike(object) {
+                return !Iterator.isWindow(object) && object.hasOwnProperty("length");
             },
             writable: true,
             configurable: true

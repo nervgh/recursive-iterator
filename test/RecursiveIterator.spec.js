@@ -87,6 +87,26 @@ describe('Do not iterate over objects if it keys.length === 0', function() {
 });
 
 
+describe('Iterate array like objects only by numeric keys', function() {
+    var root = {
+        '0': 1,
+        'test': 2,
+        'length': 1
+    };
+    var queue = [];
+
+    var iterator = new RecursiveIterator(root);
+    for(var item = iterator.next(); !item.done; item = iterator.next()) {
+        var state = item.value;
+        queue.push(state);
+    }
+
+    it('queue.length must be 1', function() {
+        expect(queue.length).toEqual(1);
+    });
+});
+
+
 describe('Testing of destroy() method', function() {
     var root = {
         object: {
