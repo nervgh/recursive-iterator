@@ -157,8 +157,8 @@ Clears the cache and queue. It calls automatically at the end of the loop.
 
 ## Callbacks
 
-### onStepInto(object)
-It calls for each object. If returns `false` object will be skipped:
+### onStepInto(parent, node, key, path, deep)
+It calls for each `{Object} node`. If returns `false` object will be skipped:
 ```js
 var root = {
     object: {
@@ -168,8 +168,8 @@ var root = {
 };
 
 var iterator = new RecursiveIterator(root);
-iterator.onStepInto = function(object) {
-    // prevent step into object
+iterator.onStepInto = function(parent, node, key, path, deep) {
+    // prevent step into node
     return false;
 };
 

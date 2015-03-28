@@ -103,16 +103,17 @@ var Iterator = (function () {
         },
         getChildNodes: {
             /**
-             * @param {Object|Array} object
+             * Returns descriptors of child nodes
+             * @param {Object} node
              * @param {Array} path
              * @param {Number} deep
-             * @returns {Array}
+             * @returns {Array<Object>}
              * @private
              */
 
-            value: function getChildNodes(object, path, deep) {
-                return Iterator.getKeys(object).map(function (key) {
-                    return Iterator.getNode(object, object[key], key, path.concat(key), deep + 1);
+            value: function getChildNodes(node, path, deep) {
+                return Iterator.getKeys(node).map(function (key) {
+                    return Iterator.getNode(node, node[key], key, path.concat(key), deep + 1);
                 });
             },
             writable: true,
@@ -120,6 +121,7 @@ var Iterator = (function () {
         },
         getNode: {
             /**
+             * Returns descriptor of node
              * @param {Object} [parent]
              * @param {*} [node]
              * @param {String} [key]
@@ -147,7 +149,9 @@ var Iterator = (function () {
             value: function next() {
                 var _ref = this.__node || {};
 
+                var parent = _ref.parent;
                 var node = _ref.node;
+                var key = _ref.key;
                 var path = _ref.path;
                 var deep = _ref.deep;
 
@@ -157,7 +161,7 @@ var Iterator = (function () {
                             throw new Error("Circular reference");
                         }
                     } else {
-                        if (this.onStepInto(node)) {
+                        if (this.onStepInto(parent, node, key, path, deep)) {
                             var childNodes = Iterator.getChildNodes(node, path, deep);
                             if (this.__bypassMode) {
                                 var _queue;
@@ -231,11 +235,15 @@ var Iterator = (function () {
         onStepInto: {
             /**
              * Callback
-             * @param {Object} object
+             * @param {Object} parent
+             * @param {Object} node
+             * @param {String} key
+             * @param {Array} path
+             * @param {Number} deep
              * @returns {Boolean}
              */
 
-            value: function onStepInto(object) {
+            value: function onStepInto(parent, node, key, path, deep) {
                 return true;
             },
             writable: true,

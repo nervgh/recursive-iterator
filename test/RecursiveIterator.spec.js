@@ -186,15 +186,15 @@ describe('Testing of onStepInto() callback', function() {
 
         var iterator = new RecursiveIterator(root);
         var queue = [];
-        iterator.onStepInto = function(object) {
-            queue.push(object);
+        iterator.onStepInto = function(parent, node, key, path, deep) {
+            queue.push(parent, node, key, path, deep);
             return true;
         };
         for(var item = iterator.next(); !item.done; item = iterator.next()) {
             // empty body
         }
 
-        expect(queue.length).toEqual(2);
+        expect(queue.length).toEqual(10);
     });
     it('If returns "false" node will be skipped', function() {
         var root = {

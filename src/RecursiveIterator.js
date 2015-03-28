@@ -20,7 +20,7 @@ class Iterator {
      * @returns {Object}
      */
     next() {
-        var {node, path, deep} = this.__node || {};
+        var {parent, node, key, path, deep} = this.__node || {};
 
         if (this.__maxDeep > deep && Iterator.isObject(node)) {
             if (this.isCircular(node)) {
@@ -30,7 +30,7 @@ class Iterator {
                     throw new Error('Circular reference');
                 }
             } else {
-                if (this.onStepInto(node)) {
+                if (this.onStepInto(parent, node, key, path, deep)) {
                     var childNodes = Iterator.getChildNodes(node, path, deep);
                     if (this.__bypassMode) {
                         this.__queue.push(...childNodes);
@@ -80,10 +80,14 @@ class Iterator {
     }
     /**
      * Callback
-     * @param {Object} object
+     * @param {Object} parent
+     * @param {Object} node
+     * @param {String} key
+     * @param {Array} path
+     * @param {Number} deep
      * @returns {Boolean}
      */
-    onStepInto(object) {
+    onStepInto(parent, node, key, path, deep) {
         return true;
     }
     /**
@@ -119,18 +123,20 @@ class Iterator {
         return !Iterator.isWindow(object) && object.hasOwnProperty('length');
     }
     /**
-     * @param {Object|Array} object
+     * Returns descriptors of child nodes
+     * @param {Object} node
      * @param {Array} path
      * @param {Number} deep
-     * @returns {Array}
+     * @returns {Array<Object>}
      * @private
      */
-    static getChildNodes(object, path, deep) {
-        return Iterator.getKeys(object).map((key) =>
-            Iterator.getNode(object, object[key], key, path.concat(key), deep + 1)
+    static getChildNodes(node, path, deep) {
+        return Iterator.getKeys(node).map((key) =>
+            Iterator.getNode(node, node[key], key, path.concat(key), deep + 1)
         );
     }
     /**
+     * Returns descriptor of node
      * @param {Object} [parent]
      * @param {*} [node]
      * @param {String} [key]
