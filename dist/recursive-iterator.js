@@ -54,11 +54,15 @@ var Iterator = (function () {
              */
 
             value: function getKeys(object) {
-                var keys = Object.keys(object).sort();
-                if (!Array.isArray(object) && Iterator.isArrayLike(object)) {
+                var keys = Object.keys(object);
+                if (Array.isArray(object)) {} else if (Iterator.isArrayLike(object)) {
                     keys = keys.filter(function (key) {
                         return Math.floor(Number(key)) == key;
                     });
+                    // skip sort
+                } else {
+                    // sort
+                    keys = keys.sort();
                 }
                 return keys;
             },
@@ -278,6 +282,8 @@ var Iterator = (function () {
 var RecursiveIterator = Iterator;
 
 // skip
+
+// skip sort
 return RecursiveIterator;
 
 }));
