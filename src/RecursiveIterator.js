@@ -9,7 +9,7 @@ const NODE = '__node';
 const CACHE = '__cache';
 
 
-class Iterator {
+class RecursiveIterator {
     /**
      * @param {Object|Array} root
      * @param {Number} [bypassMode=0]
@@ -20,8 +20,8 @@ class Iterator {
         this[BYPASS_MODE] = bypassMode;
         this[IGNORE_CIRCULAR] = ignoreCircular;
         this[MAX_DEEP] = maxDeep;
-        this[QUEUE] = [...Iterator.getChildNodes(root, [], 0)];
-        this[NODE] = Iterator.getNode();
+        this[QUEUE] = [...RecursiveIterator.getChildNodes(root, [], 0)];
+        this[NODE] = RecursiveIterator.getNode();
         this[CACHE] = [root];
         this.__makeIterable();
     }
@@ -31,7 +31,7 @@ class Iterator {
     next() {
         var {parent, node, key, path, deep} = this[NODE] || {};
 
-        if (this[MAX_DEEP] > deep && Iterator.isObject(node)) {
+        if (this[MAX_DEEP] > deep && RecursiveIterator.isObject(node)) {
             if (this.isCircular(node)) {
                 if (this[IGNORE_CIRCULAR]) {
                     // skip
@@ -40,7 +40,7 @@ class Iterator {
                 }
             } else {
                 if (this.onStepInto(parent, node, key, path, deep)) {
-                    var childNodes = Iterator.getChildNodes(node, path, deep);
+                    var childNodes = RecursiveIterator.getChildNodes(node, path, deep);
                     if (this[BYPASS_MODE]) {
                         this[QUEUE].push(...childNodes);
                     } else {
@@ -73,8 +73,8 @@ class Iterator {
      * @returns {Boolean}
      */
     isLeaf(any) {
-        if (!Iterator.isObject(any)) return true;
-        var keys = Iterator.getKeys(any);
+        if (!RecursiveIterator.isObject(any)) return true;
+        var keys = RecursiveIterator.getKeys(any);
         return !keys.length;
     }
     /**
@@ -104,7 +104,7 @@ class Iterator {
         var keys = Object.keys(object);
         if (Array.isArray(object)) {
             // skip sort
-        } else if(Iterator.isArrayLike(object)) {
+        } else if(RecursiveIterator.isArrayLike(object)) {
             keys = keys.filter((key) => Math.floor(Number(key)) == key);
             // skip sort
         } else {
@@ -132,7 +132,7 @@ class Iterator {
      * @returns {Boolean}
      */
     static isArrayLike(object) {
-        return !Iterator.isWindow(object) && object.hasOwnProperty('length');
+        return !RecursiveIterator.isWindow(object) && object.hasOwnProperty('length');
     }
     /**
      * Returns descriptors of child nodes
@@ -142,8 +142,8 @@ class Iterator {
      * @returns {Array<Object>}
      */
     static getChildNodes(node, path, deep) {
-        return Iterator.getKeys(node).map((key) =>
-            Iterator.getNode(node, node[key], key, path.concat(key), deep + 1)
+        return RecursiveIterator.getKeys(node).map((key) =>
+            RecursiveIterator.getNode(node, node[key], key, path.concat(key), deep + 1)
         );
     }
     /**
@@ -170,7 +170,5 @@ class Iterator {
 }
 
 
-//export default Iterator;
-
 // necessary for correct assembly
-let RecursiveIterator = Iterator;
+//export default RecursiveIterator;

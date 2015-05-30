@@ -30,7 +30,7 @@ var QUEUE = "__queue";
 var NODE = "__node";
 var CACHE = "__cache";
 
-var Iterator = (function () {
+var RecursiveIterator = (function () {
     /**
      * @param {Object|Array} root
      * @param {Number} [bypassMode=0]
@@ -38,23 +38,23 @@ var Iterator = (function () {
      * @param {Number} [maxDeep=100]
      */
 
-    function Iterator(root) {
+    function RecursiveIterator(root) {
         var bypassMode = arguments[1] === undefined ? 0 : arguments[1];
         var ignoreCircular = arguments[2] === undefined ? false : arguments[2];
         var maxDeep = arguments[3] === undefined ? 100 : arguments[3];
 
-        _classCallCheck(this, Iterator);
+        _classCallCheck(this, RecursiveIterator);
 
         this[BYPASS_MODE] = bypassMode;
         this[IGNORE_CIRCULAR] = ignoreCircular;
         this[MAX_DEEP] = maxDeep;
-        this[QUEUE] = [].concat(_toConsumableArray(Iterator.getChildNodes(root, [], 0)));
-        this[NODE] = Iterator.getNode();
+        this[QUEUE] = [].concat(_toConsumableArray(RecursiveIterator.getChildNodes(root, [], 0)));
+        this[NODE] = RecursiveIterator.getNode();
         this[CACHE] = [root];
         this.__makeIterable();
     }
 
-    _prototypeProperties(Iterator, {
+    _prototypeProperties(RecursiveIterator, {
         getKeys: {
             /**
              * @param {Object|Array} object
@@ -63,7 +63,7 @@ var Iterator = (function () {
 
             value: function getKeys(object) {
                 var keys = Object.keys(object);
-                if (Array.isArray(object)) {} else if (Iterator.isArrayLike(object)) {
+                if (Array.isArray(object)) {} else if (RecursiveIterator.isArrayLike(object)) {
                     keys = keys.filter(function (key) {
                         return Math.floor(Number(key)) == key;
                     });
@@ -108,7 +108,7 @@ var Iterator = (function () {
              */
 
             value: function isArrayLike(object) {
-                return !Iterator.isWindow(object) && object.hasOwnProperty("length");
+                return !RecursiveIterator.isWindow(object) && object.hasOwnProperty("length");
             },
             writable: true,
             configurable: true
@@ -123,8 +123,8 @@ var Iterator = (function () {
              */
 
             value: function getChildNodes(node, path, deep) {
-                return Iterator.getKeys(node).map(function (key) {
-                    return Iterator.getNode(node, node[key], key, path.concat(key), deep + 1);
+                return RecursiveIterator.getKeys(node).map(function (key) {
+                    return RecursiveIterator.getNode(node, node[key], key, path.concat(key), deep + 1);
                 });
             },
             writable: true,
@@ -165,14 +165,14 @@ var Iterator = (function () {
                 var path = _ref.path;
                 var deep = _ref.deep;
 
-                if (this[MAX_DEEP] > deep && Iterator.isObject(node)) {
+                if (this[MAX_DEEP] > deep && RecursiveIterator.isObject(node)) {
                     if (this.isCircular(node)) {
                         if (this[IGNORE_CIRCULAR]) {} else {
                             throw new Error("Circular reference");
                         }
                     } else {
                         if (this.onStepInto(parent, node, key, path, deep)) {
-                            var childNodes = Iterator.getChildNodes(node, path, deep);
+                            var childNodes = RecursiveIterator.getChildNodes(node, path, deep);
                             if (this[BYPASS_MODE]) {
                                 var _QUEUE;
 
@@ -219,9 +219,9 @@ var Iterator = (function () {
              */
 
             value: function isLeaf(any) {
-                if (!Iterator.isObject(any)) {
+                if (!RecursiveIterator.isObject(any)) {
                     return true;
-                }var keys = Iterator.getKeys(any);
+                }var keys = RecursiveIterator.getKeys(any);
                 return !keys.length;
             },
             writable: true,
@@ -276,17 +276,15 @@ var Iterator = (function () {
         }
     });
 
-    return Iterator;
+    return RecursiveIterator;
 })();
-
-//export default Iterator;
-
-// necessary for correct assembly
-var RecursiveIterator = Iterator;
 
 // skip
 
 // skip sort
+
+// necessary for correct assembly
+//export default RecursiveIterator;
 return RecursiveIterator;
 
 }));
