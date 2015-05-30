@@ -134,7 +134,6 @@ class Iterator {
      * @param {Array} path
      * @param {Number} deep
      * @returns {Array<Object>}
-     * @private
      */
     static getChildNodes(node, path, deep) {
         return Iterator.getKeys(node).map((key) =>
@@ -149,7 +148,6 @@ class Iterator {
      * @param {Array} [path]
      * @param {Number} [deep]
      * @returns {Object}
-     * @private
      */
     static getNode(parent, node, key, path = [], deep = 0) {
         return {parent, node, key, path, deep};
