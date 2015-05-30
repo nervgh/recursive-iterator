@@ -1,5 +1,14 @@
 
 
+// PRIVATE PROPERTIES
+const BYPASS_MODE = '__bypassMode';
+const IGNORE_CIRCULAR = '__ignoreCircular';
+const MAX_DEEP = '__maxDeep';
+const QUEUE = '__queue';
+const NODE = '__node';
+const CACHE = '__cache';
+
+
 class Iterator {
     /**
      * @param {Object|Array} root
@@ -8,23 +17,23 @@ class Iterator {
      * @param {Number} [maxDeep=100]
      */
     constructor(root, bypassMode = 0, ignoreCircular = false, maxDeep = 100) {
-        this.__bypassMode = bypassMode;
-        this.__ignoreCircular = ignoreCircular;
-        this.__maxDeep = maxDeep;
-        this.__queue = [...Iterator.getChildNodes(root, [], 0)];
-        this.__node = Iterator.getNode();
-        this.__cache = [root];
+        this[BYPASS_MODE] = bypassMode;
+        this[IGNORE_CIRCULAR] = ignoreCircular;
+        this[MAX_DEEP] = maxDeep;
+        this[QUEUE] = [...Iterator.getChildNodes(root, [], 0)];
+        this[NODE] = Iterator.getNode();
+        this[CACHE] = [root];
         this.__makeIterable();
     }
     /**
      * @returns {Object}
      */
     next() {
-        var {parent, node, key, path, deep} = this.__node || {};
+        var {parent, node, key, path, deep} = this[NODE] || {};
 
-        if (this.__maxDeep > deep && Iterator.isObject(node)) {
+        if (this[MAX_DEEP] > deep && Iterator.isObject(node)) {
             if (this.isCircular(node)) {
-                if (this.__ignoreCircular) {
+                if (this[IGNORE_CIRCULAR]) {
                     // skip
                 } else {
                     throw new Error('Circular reference');
@@ -32,35 +41,32 @@ class Iterator {
             } else {
                 if (this.onStepInto(parent, node, key, path, deep)) {
                     var childNodes = Iterator.getChildNodes(node, path, deep);
-                    if (this.__bypassMode) {
-                        this.__queue.push(...childNodes);
+                    if (this[BYPASS_MODE]) {
+                        this[QUEUE].push(...childNodes);
                     } else {
-                        this.__queue.unshift(...childNodes);
+                        this[QUEUE].unshift(...childNodes);
                     }
-                    this.__cache.push(node);
+                    this[CACHE].push(node);
                 }
             }
         }
 
-        var value = this.__queue.shift();
+        var value = this[QUEUE].shift();
         var done = !value;
 
-        this.__node = value;
+        this[NODE] = value;
 
         if (done) this.destroy();
 
-        return {
-            value,
-            done
-        };
+        return {value, done};
     }
     /**
      *
      */
     destroy() {
-        this.__queue.length = 0;
-        this.__cache.length = 0;
-        this.__node = null;
+        this[QUEUE].length = 0;
+        this[CACHE].length = 0;
+        this[NODE] = null;
     }
     /**
      * @param {*} any
@@ -76,7 +82,7 @@ class Iterator {
      * @returns {Boolean}
      */
     isCircular(any) {
-        return this.__cache.indexOf(any) !== -1
+        return this[CACHE].indexOf(any) !== -1
     }
     /**
      * Callback

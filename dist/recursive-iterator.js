@@ -22,6 +22,14 @@ var _prototypeProperties = function (child, staticProps, instanceProps) { if (st
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
+// PRIVATE PROPERTIES
+var BYPASS_MODE = "__bypassMode";
+var IGNORE_CIRCULAR = "__ignoreCircular";
+var MAX_DEEP = "__maxDeep";
+var QUEUE = "__queue";
+var NODE = "__node";
+var CACHE = "__cache";
+
 var Iterator = (function () {
     /**
      * @param {Object|Array} root
@@ -37,12 +45,12 @@ var Iterator = (function () {
 
         _classCallCheck(this, Iterator);
 
-        this.__bypassMode = bypassMode;
-        this.__ignoreCircular = ignoreCircular;
-        this.__maxDeep = maxDeep;
-        this.__queue = [].concat(_toConsumableArray(Iterator.getChildNodes(root, [], 0)));
-        this.__node = Iterator.getNode();
-        this.__cache = [root];
+        this[BYPASS_MODE] = bypassMode;
+        this[IGNORE_CIRCULAR] = ignoreCircular;
+        this[MAX_DEEP] = maxDeep;
+        this[QUEUE] = [].concat(_toConsumableArray(Iterator.getChildNodes(root, [], 0)));
+        this[NODE] = Iterator.getNode();
+        this[CACHE] = [root];
         this.__makeIterable();
     }
 
@@ -112,7 +120,6 @@ var Iterator = (function () {
              * @param {Array} path
              * @param {Number} deep
              * @returns {Array<Object>}
-             * @private
              */
 
             value: function getChildNodes(node, path, deep) {
@@ -132,7 +139,6 @@ var Iterator = (function () {
              * @param {Array} [path]
              * @param {Number} [deep]
              * @returns {Object}
-             * @private
              */
 
             value: function getNode(parent, node, key) {
@@ -151,7 +157,7 @@ var Iterator = (function () {
              */
 
             value: function next() {
-                var _ref = this.__node || {};
+                var _ref = this[NODE] || {};
 
                 var parent = _ref.parent;
                 var node = _ref.node;
@@ -159,39 +165,36 @@ var Iterator = (function () {
                 var path = _ref.path;
                 var deep = _ref.deep;
 
-                if (this.__maxDeep > deep && Iterator.isObject(node)) {
+                if (this[MAX_DEEP] > deep && Iterator.isObject(node)) {
                     if (this.isCircular(node)) {
-                        if (this.__ignoreCircular) {} else {
+                        if (this[IGNORE_CIRCULAR]) {} else {
                             throw new Error("Circular reference");
                         }
                     } else {
                         if (this.onStepInto(parent, node, key, path, deep)) {
                             var childNodes = Iterator.getChildNodes(node, path, deep);
-                            if (this.__bypassMode) {
-                                var _queue;
+                            if (this[BYPASS_MODE]) {
+                                var _QUEUE;
 
-                                (_queue = this.__queue).push.apply(_queue, _toConsumableArray(childNodes));
+                                (_QUEUE = this[QUEUE]).push.apply(_QUEUE, _toConsumableArray(childNodes));
                             } else {
-                                var _queue2;
+                                var _QUEUE2;
 
-                                (_queue2 = this.__queue).unshift.apply(_queue2, _toConsumableArray(childNodes));
+                                (_QUEUE2 = this[QUEUE]).unshift.apply(_QUEUE2, _toConsumableArray(childNodes));
                             }
-                            this.__cache.push(node);
+                            this[CACHE].push(node);
                         }
                     }
                 }
 
-                var value = this.__queue.shift();
+                var value = this[QUEUE].shift();
                 var done = !value;
 
-                this.__node = value;
+                this[NODE] = value;
 
                 if (done) this.destroy();
 
-                return {
-                    value: value,
-                    done: done
-                };
+                return { value: value, done: done };
             },
             writable: true,
             configurable: true
@@ -202,9 +205,9 @@ var Iterator = (function () {
              */
 
             value: function destroy() {
-                this.__queue.length = 0;
-                this.__cache.length = 0;
-                this.__node = null;
+                this[QUEUE].length = 0;
+                this[CACHE].length = 0;
+                this[NODE] = null;
             },
             writable: true,
             configurable: true
@@ -231,7 +234,7 @@ var Iterator = (function () {
              */
 
             value: function isCircular(any) {
-                return this.__cache.indexOf(any) !== -1;
+                return this[CACHE].indexOf(any) !== -1;
             },
             writable: true,
             configurable: true
