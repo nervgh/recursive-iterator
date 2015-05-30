@@ -1,5 +1,10 @@
 
 
+import isArray from './lang/isArray';
+import isArrayLike from './lang/isArrayLike';
+import isObject from './lang/isObject';
+
+
 // PRIVATE PROPERTIES
 const BYPASS_MODE = '__bypassMode';
 const IGNORE_CIRCULAR = '__ignoreCircular';
@@ -31,7 +36,7 @@ class RecursiveIterator {
     next() {
         var {parent, node, key, path, deep} = this[NODE] || {};
 
-        if (this[MAX_DEEP] > deep && RecursiveIterator.isObject(node)) {
+        if (this[MAX_DEEP] > deep && isObject(node)) {
             if (this.isCircular(node)) {
                 if (this[IGNORE_CIRCULAR]) {
                     // skip
@@ -73,7 +78,7 @@ class RecursiveIterator {
      * @returns {Boolean}
      */
     isLeaf(any) {
-        if (!RecursiveIterator.isObject(any)) return true;
+        if (!isObject(any)) return true;
         var keys = RecursiveIterator.getKeys(any);
         return !keys.length;
     }
@@ -102,9 +107,10 @@ class RecursiveIterator {
      */
     static getKeys(object) {
         var keys = Object.keys(object);
-        if (Array.isArray(object)) {
+        if (isArray(object)) {
             // skip sort
-        } else if(RecursiveIterator.isArrayLike(object)) {
+        } else if(isArrayLike(object)) {
+            // is integer
             keys = keys.filter((key) => Math.floor(Number(key)) == key);
             // skip sort
         } else {
@@ -112,27 +118,6 @@ class RecursiveIterator {
             keys = keys.sort();
         }
         return keys;
-    }
-    /**
-     * @param {*} any
-     * @returns {Boolean}
-     */
-    static isObject(any) {
-        return any instanceof Object;
-    }
-    /**
-     * @param {Object} object
-     * @returns {Boolean}
-     */
-    static isWindow(object) {
-        return object === object.window;
-    }
-    /**
-     * @param {Object} object
-     * @returns {Boolean}
-     */
-    static isArrayLike(object) {
-        return !RecursiveIterator.isWindow(object) && object.hasOwnProperty('length');
     }
     /**
      * Returns descriptors of child nodes
@@ -170,5 +155,4 @@ class RecursiveIterator {
 }
 
 
-// necessary for correct assembly
-//export default RecursiveIterator;
+export default RecursiveIterator;

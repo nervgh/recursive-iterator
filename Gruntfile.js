@@ -1,8 +1,11 @@
 'use strict';
 
+var loadGruntTasks = require('load-grunt-tasks');
+var webpack = require('webpack');
+
 
 module.exports = function(grunt) {
-    require('load-grunt-tasks')(grunt);
+    loadGruntTasks(grunt);
 
     grunt.initConfig({
 
@@ -15,55 +18,12 @@ module.exports = function(grunt) {
                     ' <%= pkg.homepage %>\n' +
                     '*/\n',
 
-        // https://github.com/gruntjs/grunt-contrib-copy
-        copy: {
-            common: {
-                files: [
-                    {
-                        src: './dist/recursive-iterator.umd.js',
-                        dest: './dist/recursive-iterator.js'
-                    },
-                    {
-                        src: './dist/recursive-iterator.min.umd.js',
-                        dest: './dist/recursive-iterator.min.js'
-                    }
-                ]
-            }
-        },
-
         // https://github.com/gruntjs/grunt-contrib-clean
         clean: {
             common: [
                 'dist/*',
                 '!dist/*.txt'
-            ],
-            umd: [
-                'dist/*.umd.js',
-                '!dist/*.txt'
             ]
-        },
-
-        // https://github.com/bebraw/grunt-umd
-        umd: {
-            common: {
-                src: 'dist/recursive-iterator.js',
-                dest: 'dist/recursive-iterator.umd.js',
-                objectToExport: 'RecursiveIterator',
-                globalAlias: 'RecursiveIterator',
-                amdModuleId: 'RecursiveIterator',
-                indent: 4
-            }
-        },
-
-        // https://github.com/gruntjs/grunt-contrib-uglify
-        uglify: {
-            common: {
-                src: 'dist/recursive-iterator.umd.js',
-                dest: 'dist/recursive-iterator.min.umd.js',
-                options: {
-                    banner: '<%= banner %>'
-                }
-            }
         },
 
         // https://github.com/gruntjs/grunt-contrib-watch
@@ -81,12 +41,45 @@ module.exports = function(grunt) {
             }
         },
 
-        // https://github.com/babel/grunt-babel
-        babel: {
-            dist: {
-                files: {
-                    './dist/recursive-iterator.js': './src/RecursiveIterator.js'
-                }
+        // webpack
+        // http://babeljs.io/docs/using-babel/#webpack
+        // https://github.com/webpack/grunt-webpack
+        webpack: {
+            // common
+            options: {
+                module: {
+                    loaders: [
+                        // https://github.com/babel/babel-loader
+                        {test: /\.js$/, loader: 'babel'}
+                    ]
+                },
+                plugins: [
+                    // http://webpack.github.io/docs/list-of-plugins.html#uglifyjsplugin
+                    new webpack.optimize.UglifyJsPlugin({
+                        compress: {
+                            warnings: false
+                        }
+                    }),
+                    // http://webpack.github.io/docs/list-of-plugins.html#bannerplugin
+                    new webpack.BannerPlugin('<%= banner %>', {
+                        entryOnly: true,
+                        raw: true
+                    })
+                ]
+            },
+            // recursive-iterator
+            iterator: {
+                entry: {
+                    'recursive-iterator': './src/RecursiveIterator.js'
+                },
+                output: {
+                    path: './dist/',
+                    filename: '[name].min.js',
+                    library: 'RecursiveIterator',
+                    libraryTarget: 'umd'
+                },
+                devtool: 'source-map',
+                debug: true
             }
         },
 
@@ -111,7 +104,7 @@ module.exports = function(grunt) {
                 colors: true,
                 //
                 files: [
-                    'dist/recursive-iterator.js',
+                    'dist/recursive-iterator.min.js',
                     'test/*.js'
                 ],
                 //
@@ -139,6 +132,6 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('default', [
-        'clean:common', 'babel', 'umd', 'uglify', 'copy', 'clean:umd', 'karma:phantom'
+        'clean', 'webpack', 'karma:phantom'
     ]);
 };

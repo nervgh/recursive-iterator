@@ -1,7 +1,7 @@
 
 
 describe('RecursiveIterator must be defined', function() {
-    it('Object.traverse to be defined', function() {
+    it('RecursiveIterator to be defined', function() {
         expect(RecursiveIterator).toBeDefined();
     });
 });

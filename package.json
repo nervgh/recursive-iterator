@@ -1,6 +1,6 @@
 {
     "name": "recursive-iterator",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "Iterates javascript object recursively. Supports ES6 iteration protocols.",
     "homepage": "https://github.com/nervgh/recursive-iterator",
     "license": "MIT",
@@ -29,13 +29,12 @@
         "url": "https://github.com/nervgh"
     },
     "devDependencies": {
-        "grunt-babel": "^4.0.0",
-        "grunt-contrib-copy": "^0.7.0",
+        "babel": "^4.7.16",
+        "babel-loader": "^4.0.0",
         "grunt-contrib-clean": "^0.6.0",
         "grunt-contrib-watch": "^0.6.1",
-        "grunt-contrib-uglify": "^0.2.1",
         "grunt-karma": "^0.9.0",
-        "grunt-umd": "^2.3.2",
+        "grunt-webpack": "^1.0.8",
         "karma-jasmine": "^0.1.5",
         "karma-phantomjs-launcher": "^0.1.4",
         "load-grunt-tasks": "^3.1.0"
