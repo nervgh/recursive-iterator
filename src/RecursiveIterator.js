@@ -25,8 +25,8 @@ class RecursiveIterator {
         this[BYPASS_MODE] = bypassMode;
         this[IGNORE_CIRCULAR] = ignoreCircular;
         this[MAX_DEEP] = maxDeep;
-        this[QUEUE] = [...RecursiveIterator.getChildNodes(root, [], 0)];
-        this[NODE] = RecursiveIterator.getNode();
+        this[QUEUE] = [...this.getChildNodes(root, [], 0)];
+        this[NODE] = this.getNode();
         this[CACHE] = [root];
         this.__makeIterable();
     }
@@ -45,7 +45,7 @@ class RecursiveIterator {
                 }
             } else {
                 if (this.onStepInto(parent, node, key, path, deep)) {
-                    var childNodes = RecursiveIterator.getChildNodes(node, path, deep);
+                    var childNodes = this.getChildNodes(node, path, deep);
                     if (this[BYPASS_MODE]) {
                         this[QUEUE].push(...childNodes);
                     } else {
@@ -79,7 +79,7 @@ class RecursiveIterator {
      */
     isLeaf(any) {
         if (!isObject(any)) return true;
-        var keys = RecursiveIterator.getKeys(any);
+        var keys = this.getKeys(any);
         return !keys.length;
     }
     /**
@@ -105,7 +105,7 @@ class RecursiveIterator {
      * @param {Object|Array} object
      * @returns {Array<String>}
      */
-    static getKeys(object) {
+    getKeys(object) {
         var keys = Object.keys(object);
         if (isArray(object)) {
             // skip sort
@@ -126,9 +126,9 @@ class RecursiveIterator {
      * @param {Number} deep
      * @returns {Array<Object>}
      */
-    static getChildNodes(node, path, deep) {
-        return RecursiveIterator.getKeys(node).map((key) =>
-            RecursiveIterator.getNode(node, node[key], key, path.concat(key), deep + 1)
+    getChildNodes(node, path, deep) {
+        return this.getKeys(node).map((key) =>
+            this.getNode(node, node[key], key, path.concat(key), deep + 1)
         );
     }
     /**
@@ -140,7 +140,7 @@ class RecursiveIterator {
      * @param {Number} [deep]
      * @returns {Object}
      */
-    static getNode(parent, node, key, path = [], deep = 0) {
+    getNode(parent, node, key, path = [], deep = 0) {
         return {parent, node, key, path, deep};
     }
     /**
