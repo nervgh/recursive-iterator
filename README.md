@@ -49,13 +49,13 @@ for(let {node, path} of new RecursiveIterator(root)) {
 ```
 
 ## Roadmap
-* [Syntax](/wiki/ES6-&-ES5-syntax)
-    * [ES6](/wiki/Syntax#es6)
-    * [ES5](/wiki/Syntax#es5)
+* [Syntax](https://github.com/nervgh/recursive-iterator/wiki/Syntax)
+    * [ES6](https://github.com/nervgh/recursive-iterator/wiki/Syntax#es6)
+    * [ES5](https://github.com/nervgh/recursive-iterator/wiki/Syntax#es5)
 * API
-    * [Options](/wiki/Options)
-    * [Methods & Callbacks](/wiki/Methods-&-Callbacks)
-* [Cookbook (es6)](/wiki/Cookbook-(es6))
-    * [Iterator (not recursive)](/wiki/Cookbook-(es6)#iterator-not-recursive)
-    * [DomIterator](/wiki/Cookbook-(es6)#domiterator)
-    * [Deep copy / Deep clone](/wiki/Cookbook-(es6)#deep-copy--deep-clone)
+    * [Options](https://github.com/nervgh/recursive-iterator/wiki/Options)
+    * [Methods & Callbacks](https://github.com/nervgh/recursive-iterator/wiki/Methods-&-Callbacks)
+* [Cookbook (es6)](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6))
+    * [Iterator (not recursive)](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#iterator-not-recursive)
+    * [DomIterator](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#domiterator)
+    * [Deep copy / Deep clone](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#deep-copy--deep-clone)
