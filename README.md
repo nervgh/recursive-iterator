@@ -59,3 +59,4 @@ for(let {node, path} of new RecursiveIterator(root)) {
     * [Iterator (not recursive)](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#iterator-not-recursive)
     * [DomIterator](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#domiterator)
     * [Deep copy / Deep clone](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#deep-copy--deep-clone)
+    * [Uninformed search algorithms](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#uninformed-search-algorithms)
