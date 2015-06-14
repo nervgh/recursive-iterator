@@ -134,6 +134,75 @@ describe('Testing of destroy() method', function() {
 });
 
 
+describe('Testing of isNode() method', function() {
+    it('Calls for each node', function() {
+        var root = {
+            date: new Date(),
+            object: {
+                number: 1
+            },
+            string: 'walker'
+        };
+
+        var isObject = function(any) {
+            return any !== null && typeof any === 'object';
+        };
+
+        var iterator = new RecursiveIterator(root);
+        var queue = [];
+        iterator.isNode = function(any) {
+            queue.push(any);
+            return isObject(any);
+        };
+        for(var item = iterator.next(); !item.done; item = iterator.next()) {
+            // empty body
+        }
+
+        expect(queue.length).toEqual(5);
+    });
+    it('Use isNode() for root node', function() {
+        var root = {
+            date: new Date(),
+            object: {
+                number: 1
+            },
+            string: 'walker'
+        };
+
+        var iterator = new RecursiveIterator(root);
+        var queue = [];
+        iterator.isNode = function(any) {
+            return false;
+        };
+        for(var item = iterator.next(); !item.done; item = iterator.next()) {
+            queue.push(true);
+        }
+
+        expect(queue.length).toEqual(0);
+    });
+    it('If returns "false" node will be skipped', function() {
+        var root = {
+            date: new Date(),
+            object: {
+                number: 1
+            },
+            string: 'walker'
+        };
+
+        var iterator = new RecursiveIterator(root);
+        var queue = [];
+        iterator.isNode = function(any) {
+            return any === root;
+        };
+        for(var item = iterator.next(); !item.done; item = iterator.next()) {
+            queue.push(item);
+        }
+
+        expect(queue.length).toEqual(3);
+    });
+});
+
+
 describe('Testing of isLeaf() method', function() {
     var root = {
         date: new Date(),
@@ -145,12 +214,9 @@ describe('Testing of isLeaf() method', function() {
 
     var iterator = new RecursiveIterator(root);
 
-    it('Leaf is objects whose keys.length === 0', function() {
-        expect(iterator.isLeaf(iterator.next().value.node)).toBeTruthy(); // date
-    });
     it('Leaf is all primitive types', function() {
+        expect(iterator.isLeaf(iterator.next().value.node)).toBeFalsy(); // date
         expect(iterator.isLeaf(iterator.next().value.node)).toBeFalsy(); // object
-        expect(iterator.isLeaf(iterator.next().value.node)).toBeTruthy(); // object.number
         expect(iterator.isLeaf(iterator.next().value.node)).toBeTruthy(); // string
     });
 });
@@ -170,51 +236,6 @@ describe('Testing of isCircular() method', function() {
         expect(iterator.isCircular(iterator.next().value.node)).toBeFalsy();
         expect(iterator.isCircular(iterator.next().value.node)).toBeTruthy();
         expect(iterator.isCircular(iterator.next().value.node)).toBeFalsy();
-    });
-});
-
-
-describe('Testing of onStepInto() callback', function() {
-    it('Calls for each object', function() {
-        var root = {
-            date: new Date(),
-            object: {
-                number: 1
-            },
-            string: 'walker'
-        };
-
-        var iterator = new RecursiveIterator(root);
-        var queue = [];
-        iterator.onStepInto = function(parent, node, key, path, deep) {
-            queue.push(parent, node, key, path, deep);
-            return true;
-        };
-        for(var item = iterator.next(); !item.done; item = iterator.next()) {
-            // empty body
-        }
-
-        expect(queue.length).toEqual(10);
-    });
-    it('If returns "false" node will be skipped', function() {
-        var root = {
-            date: new Date(),
-            object: {
-                number: 1
-            },
-            string: 'walker'
-        };
-
-        var iterator = new RecursiveIterator(root);
-        var queue = [];
-        iterator.onStepInto = function(object) {
-            return false;
-        };
-        for(var item = iterator.next(); !item.done; item = iterator.next()) {
-            queue.push(true);
-        }
-
-        expect(queue.length).toEqual(3);
     });
 });
 

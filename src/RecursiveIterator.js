@@ -1,17 +1,19 @@
 
 
-import isArray from './lang/isArray';
-import isArrayLike from './lang/isArrayLike';
 import isObject from './lang/isObject';
+import getKeys from './lang/getKeys';
 
 
 // PRIVATE PROPERTIES
 const BYPASS_MODE = '__bypassMode';
 const IGNORE_CIRCULAR = '__ignoreCircular';
 const MAX_DEEP = '__maxDeep';
-const QUEUE = '__queue';
-const NODE = '__node';
 const CACHE = '__cache';
+const QUEUE = '__queue';
+const STATE = '__state';
+
+
+const EMPTY_STATE = {};
 
 
 class RecursiveIterator {
@@ -25,33 +27,32 @@ class RecursiveIterator {
         this[BYPASS_MODE] = bypassMode;
         this[IGNORE_CIRCULAR] = ignoreCircular;
         this[MAX_DEEP] = maxDeep;
-        this[QUEUE] = [...this.getChildNodes(root, [], 0)];
-        this[NODE] = this.getNode();
-        this[CACHE] = [root];
+        this[CACHE] = [];
+        this[QUEUE] = [];
+        this[STATE] = this.getState(undefined, root);
         this.__makeIterable();
     }
     /**
      * @returns {Object}
      */
     next() {
-        var {parent, node, key, path, deep} = this[NODE] || {};
+        var {node, path, deep} = this[STATE] || EMPTY_STATE;
 
-        if (this[MAX_DEEP] > deep && isObject(node)) {
-            if (this.isCircular(node)) {
-                if (this[IGNORE_CIRCULAR]) {
-                    // skip
-                } else {
-                    throw new Error('Circular reference');
-                }
-            } else {
-                if (this.onStepInto(parent, node, key, path, deep)) {
-                    var childNodes = this.getChildNodes(node, path, deep);
-                    if (this[BYPASS_MODE]) {
-                        this[QUEUE].push(...childNodes);
+        if (this[MAX_DEEP] > deep) {
+            if (this.isNode(node)) {
+                if (this.isCircular(node)) {
+                    if (this[IGNORE_CIRCULAR]) {
+                        // skip
                     } else {
-                        this[QUEUE].unshift(...childNodes);
+                        throw new Error('Circular reference');
                     }
-                    this[CACHE].push(node);
+                } else {
+                    if (this.onStepInto(this[STATE])) {
+                        let descriptors = this.getStatesOfChildNodes(node, path, deep);
+                        let method = this[BYPASS_MODE] ? 'push' : 'unshift';
+                        this[QUEUE][method](...descriptors);
+                        this[CACHE].push(node);
+                    }
                 }
             }
         }
@@ -59,7 +60,7 @@ class RecursiveIterator {
         var value = this[QUEUE].shift();
         var done = !value;
 
-        this[NODE] = value;
+        this[STATE] = value;
 
         if (done) this.destroy();
 
@@ -71,16 +72,21 @@ class RecursiveIterator {
     destroy() {
         this[QUEUE].length = 0;
         this[CACHE].length = 0;
-        this[NODE] = null;
+        this[STATE] = null;
+    }
+    /**
+     * @param {*} any
+     * @returns {Boolean}
+     */
+    isNode(any) {
+        return isObject(any);
     }
     /**
      * @param {*} any
      * @returns {Boolean}
      */
     isLeaf(any) {
-        if (!isObject(any)) return true;
-        var keys = this.getKeys(any);
-        return !keys.length;
+        return !this.isNode(any);
     }
     /**
      * @param {*} any
@@ -90,49 +96,19 @@ class RecursiveIterator {
         return this[CACHE].indexOf(any) !== -1
     }
     /**
-     * Callback
-     * @param {Object} parent
-     * @param {Object} node
-     * @param {String} key
-     * @param {Array} path
-     * @param {Number} deep
-     * @returns {Boolean}
-     */
-    onStepInto(parent, node, key, path, deep) {
-        return true;
-    }
-    /**
-     * @param {Object|Array} object
-     * @returns {Array<String>}
-     */
-    getKeys(object) {
-        var keys = Object.keys(object);
-        if (isArray(object)) {
-            // skip sort
-        } else if(isArrayLike(object)) {
-            // is integer
-            keys = keys.filter((key) => Math.floor(Number(key)) == key);
-            // skip sort
-        } else {
-            // sort
-            keys = keys.sort();
-        }
-        return keys;
-    }
-    /**
-     * Returns descriptors of child nodes
+     * Returns states of child nodes
      * @param {Object} node
      * @param {Array} path
      * @param {Number} deep
      * @returns {Array<Object>}
      */
-    getChildNodes(node, path, deep) {
-        return this.getKeys(node).map((key) =>
-            this.getNode(node, node[key], key, path.concat(key), deep + 1)
+    getStatesOfChildNodes(node, path, deep) {
+        return getKeys(node).map(key =>
+            this.getState(node, node[key], key, path.concat(key), deep + 1)
         );
     }
     /**
-     * Returns descriptor of node
+     * Returns state of node. Calls for each node
      * @param {Object} [parent]
      * @param {*} [node]
      * @param {String} [key]
@@ -140,8 +116,16 @@ class RecursiveIterator {
      * @param {Number} [deep]
      * @returns {Object}
      */
-    getNode(parent, node, key, path = [], deep = 0) {
+    getState(parent, node, key, path = [], deep = 0) {
         return {parent, node, key, path, deep};
+    }
+    /**
+     * Callback
+     * @param {Object} state
+     * @returns {Boolean}
+     */
+    onStepInto(state) {
+        return true;
     }
     /**
      * Only for es6
