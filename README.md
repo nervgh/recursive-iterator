@@ -61,3 +61,17 @@ for(let {node, path} of new RecursiveIterator(root)) {
     * [Deep copy / Deep clone](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#deep-copy--deep-clone)
     * [To Query String](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#to-query-string)
     * [Uninformed search algorithms](https://github.com/nervgh/recursive-iterator/wiki/Cookbook-(es6)#uninformed-search-algorithms)
+
+
+## Package managers
+### Bower
+```
+bower install recursive-iterator
+```
+You could find this module in bower like [_recursive iterator_](http://bower.io/search/?q=recursive%20iterator).
+
+### NPM
+```
+npm install recursive-iterator
+```
+You could find this module in npm like [_recursive iterator_](https://www.npmjs.com/search?q=recursive+iterator).
