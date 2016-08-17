@@ -87,22 +87,40 @@ describe('Do not iterate over objects if it keys.length === 0', function() {
 });
 
 
-describe('Iterate array like objects only by numeric keys', function() {
-    var root = {
+describe('Iterate through array-like objects', function() {
+    // This is an array-like object
+    var rootOne = {
         '0': 1,
-        'test': 2,
         'length': 1
     };
-    var queue = [];
+    var queueOne = [];
 
-    var iterator = new RecursiveIterator(root);
-    for(var item = iterator.next(); !item.done; item = iterator.next()) {
-        var state = item.value;
-        queue.push(state);
+    var iteratorOne = new RecursiveIterator(rootOne);
+    for(var itemOne = iteratorOne.next(); !itemOne.done; itemOne = iteratorOne.next()) {
+        var stateOne = itemOne.value;
+        queueOne.push(stateOne);
     }
 
     it('queue.length must be 1', function() {
-        expect(queue.length).toEqual(1);
+        expect(queueOne.length).toEqual(1);
+    });
+
+    // This is not array-like object
+    var rootTwo = {
+        'width': 0,
+        'height': 0,
+        'length': 0
+    };
+    var queueTwo = [];
+
+    var iteratorTwo = new RecursiveIterator(rootTwo);
+    for(var itemTwo = iteratorTwo.next(); !itemTwo.done; itemTwo = iteratorTwo.next()) {
+        var stateTwo = itemTwo.value;
+        queueTwo.push(stateTwo);
+    }
+
+    it('queue.length must be 3', function() {
+        expect(queueTwo.length).toEqual(3);
     });
 });
 

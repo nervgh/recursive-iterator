@@ -44,3 +44,12 @@ gulp.task(
     }, next).start();
   }
 );
+
+
+gulp.task(
+  'default',
+  [
+    `${config.name}/build`,
+    `${config.name}/test`
+  ]
+);

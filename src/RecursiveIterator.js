@@ -1,7 +1,7 @@
+'use strict';
 
 
-import isObject from './lang/isObject';
-import getKeys from './lang/getKeys';
+import {isObject,getKeys} from './lang';
 
 
 // PRIVATE PROPERTIES
@@ -16,7 +16,7 @@ const STATE = '__state';
 const EMPTY_STATE = {};
 
 
-class RecursiveIterator {
+export default class RecursiveIterator {
     /**
      * @param {Object|Array} root
      * @param {Number} [bypassMode=0]
@@ -137,6 +137,3 @@ class RecursiveIterator {
         } catch(e) {}
     }
 }
-
-
-export default RecursiveIterator;
