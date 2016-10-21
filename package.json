@@ -1,10 +1,10 @@
 {
   "name": "recursive-iterator",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Iterates javascript object recursively. Supports ES6 iteration protocols.",
   "homepage": "https://github.com/nervgh/recursive-iterator",
   "license": "MIT",
-  "main": "dist/recursive-iterator.min.js",
+  "main": "dist/recursive-iterator.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/nervgh/recursive-iterator.git"
@@ -28,9 +28,6 @@
     "name": "nerv",
     "url": "https://github.com/nervgh"
   },
-	"engines": {
-		"node": ">=6.0.0"
-	},
   "devDependencies": {
     "babel": "~4.7.16",
     "babel-core": "~4.0.0",
