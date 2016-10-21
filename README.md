@@ -1,10 +1,7 @@
 # Recursive Iterator
 
 ## About
-Iterates javascript object recursively.
-Works in ES5 and ES6 environments.
-Supports ES6 [iteration protocols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols).
-Compatible with [for...of](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/for...of) cycle.
+It iterates anything. The Recursive Iterator supports: ES5/ES6 environments, the ES6 [iteration protocols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) / [for...of](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/for...of) cycle.
 
 ## Required
 ES5
