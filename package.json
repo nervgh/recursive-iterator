@@ -18,13 +18,15 @@
   },
   "scripts": {
     "bundle": "webpack",
-    "test": "mocha"
+    "test": "mocha",
+    "test-cov": "istanbul cover _mocha --report lcovonly"
   },
   "devDependencies": {
     "babel-core": "~6.23.1",
     "babel-loader": "~6.3.2",
     "babel-preset-es2016": "~6.22.0",
     "chai": "~3.5.0",
+    "istanbul": "^0.4.5",
     "mocha": "~3.2.0",
     "webpack": "~2.2.1",
     "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony-v2.8.5",
