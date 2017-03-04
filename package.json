@@ -1,6 +1,6 @@
 {
   "name": "recursive-iterator",
-  "version": "3.0.0-alpha.0",
+  "version": "3.0.0",
   "description": "Iterates through graph or tree recursively",
   "homepage": "https://github.com/nervgh/recursive-iterator",
   "license": "MIT",
