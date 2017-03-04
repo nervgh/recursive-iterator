@@ -1,5 +1,9 @@
 # Recursive Iterator
 
+[![NPM version][npm-image]][npm-url]
+[![Build status][travis-image]][travis-url]
+[![Test coverage][coveralls-image]][coveralls-url]
+
 ## About
 Iterates through graph or tree recursively.
 
@@ -73,3 +77,12 @@ You could find this module in bower like [_recursive iterator_](http://bower.io/
 npm install recursive-iterator
 ```
 You could find this module in npm like [_recursive iterator_](https://www.npmjs.com/search?q=recursive+iterator).
+
+
+[npm-image]: https://img.shields.io/npm/v/recursive-iterator.svg?style=flat
+[npm-url]: https://npmjs.org/package/recursive-iterator
+[travis-image]: https://img.shields.io/travis/nervgh/recursive-iterator.svg?style=flat
+[travis-url]: https://travis-ci.org/nervgh/recursive-iterator
+[coveralls-image]: https://img.shields.io/coveralls/nervgh/recursive-iterator.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/nervgh/recursive-iterator?branch=master
+

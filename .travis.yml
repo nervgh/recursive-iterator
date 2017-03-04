@@ -1,5 +1,9 @@
 language: node_js
 node_js:
   - "6"
-script: "npm test"
-
+script:
+  - "npm build"
+  - "npm test-cov"
+after_script:
+  - "npm install coveralls@2"
+  - "cat ./coverage/lcov.info | coveralls"
