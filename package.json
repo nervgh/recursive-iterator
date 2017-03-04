@@ -1,17 +1,40 @@
 {
   "name": "recursive-iterator",
-  "version": "2.0.3",
-  "description": "It iterates anything. The Recursive Iterator supports: ES5/ES6 environments, the ES6 iteration protocols",
+  "version": "3.0.0-alpha.0",
+  "description": "Iterates through graph or tree recursively",
   "homepage": "https://github.com/nervgh/recursive-iterator",
   "license": "MIT",
-  "main": "dist/recursive-iterator.js",
+  "main": "src/RecursiveIterator.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/nervgh/recursive-iterator.git"
   },
+  "author": {
+    "name": "nerv",
+    "url": "https://github.com/nervgh"
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "scripts": {
+    "bundle": "webpack",
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "babel-core": "~6.23.1",
+    "babel-loader": "~6.3.2",
+    "babel-preset-es2016": "~6.22.0",
+    "chai": "~3.5.0",
+    "mocha": "~3.2.0",
+    "webpack": "~2.2.1",
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony-v2.8.5",
+    "uglifyjs-webpack-plugin": "~0.3.0"
+  },
   "keywords": [
     "js",
     "javascript",
+    "graph",
+    "vertex",
     "walk",
     "walker",
     "recursive",
@@ -19,26 +42,9 @@
     "iterator",
     "iteratate",
     "traverse",
-    "traversing",
+    "traversal",
     "object",
     "tree",
     "json"
-  ],
-  "author": {
-    "name": "nerv",
-    "url": "https://github.com/nervgh"
-  },
-  "devDependencies": {
-    "babel": "~4.7.16",
-    "babel-core": "~4.0.0",
-    "babel-loader": "~4.0.0",
-    "gulp": "~3.9.1",
-    "jasmine": "~2.4.1",
-    "karma": "~1.2.0",
-    "karma-jasmine": "~1.0.2",
-    "karma-phantomjs-launcher": "~1.0.1",
-    "phantomjs": "~1.9.20",
-    "webpack": "~1.13.1",
-    "webpack-stream": "~3.2.0"
-  }
+  ]
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 
-import {isObject,getKeys} from './lang';
+const {isObject,getKeys} = require('./lang');
 
 
 // PRIVATE PROPERTIES
@@ -16,7 +16,7 @@ const STATE = '__state';
 const EMPTY_STATE = {};
 
 
-export default class RecursiveIterator {
+class RecursiveIterator {
     /**
      * @param {Object|Array} root
      * @param {Number} [bypassMode=0]
@@ -30,13 +30,12 @@ export default class RecursiveIterator {
         this[CACHE] = [];
         this[QUEUE] = [];
         this[STATE] = this.getState(undefined, root);
-        this.__makeIterable();
     }
     /**
      * @returns {Object}
      */
     next() {
-        var {node, path, deep} = this[STATE] || EMPTY_STATE;
+        let {node, path, deep} = this[STATE] || EMPTY_STATE;
 
         if (this[MAX_DEEP] > deep) {
             if (this.isNode(node)) {
@@ -57,8 +56,8 @@ export default class RecursiveIterator {
             }
         }
 
-        var value = this[QUEUE].shift();
-        var done = !value;
+        let value = this[QUEUE].shift();
+        let done = !value;
 
         this[STATE] = value;
 
@@ -127,13 +126,13 @@ export default class RecursiveIterator {
     onStepInto(state) {
         return true;
     }
-    /**
-     * Only for es6
-     * @private
-     */
-    __makeIterable() {
-        try {
-            this[Symbol.iterator] = () => this;
-        } catch(e) {}
-    }
+  /**
+   * @returns {RecursiveIterator}
+   */
+  [Symbol.iterator]() {
+        return this;
+  }
 }
+
+
+module.exports = RecursiveIterator;

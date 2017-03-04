@@ -1,24 +1,24 @@
 # Recursive Iterator
 
 ## About
-It iterates anything. The Recursive Iterator supports: ES5/ES6 environments, the ES6 [iteration protocols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) / [for...of](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Statements/for...of) cycle.
+Iterates through graph or tree recursively.
 
-## Required
-ES5
+## Versions
++ for support ES5 see `2.x.x` versions
 
 ## Getting started
 
 ### Quick overview (es6)
 ```js
-var iterator = new RecursiveIterator(
+let iterator = new RecursiveIterator(
     root /*{Object|Array}*/,
     [bypassMode=0] /*{Number}*/,
     [ignoreCircular=false] /*{Boolean}*/,
     [maxDeep=100] /*{Number}*/
 );
 
-var {value, done} = iterator.next();
-var {parent, node, key, path, deep} = value;
+let {value, done} = iterator.next();
+let {parent, node, key, path, deep} = value;
 
 // parent is parent node
 // node is current node
@@ -29,7 +29,7 @@ var {parent, node, key, path, deep} = value;
 
 ### Example (es6)
 ```js
-var root = {
+let root = {
     object: {
         number: 1
     },

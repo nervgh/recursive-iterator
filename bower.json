@@ -1,6 +1,6 @@
 {
     "name": "recursive-iterator",
-    "description": "Iterates javascript object recursively. Supports ES6 iteration protocols.",
+    "description": "Iterates through graph or tree recursively",
     "homepage": "https://github.com/nervgh/recursive-iterator",
     "license": "MIT",
     "main": "dist/recursive-iterator.min.js",
