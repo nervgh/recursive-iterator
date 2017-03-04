@@ -2,8 +2,8 @@ language: node_js
 node_js:
   - "6"
 script:
-  - "npm bundle"
-  - "npm test-travis"
+  - "npm run bundle"
+  - "npm run test-travis"
 after_script:
   - "npm install coveralls@2"
   - "cat ./coverage/lcov.info | coveralls"
