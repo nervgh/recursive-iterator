@@ -19,7 +19,7 @@
   "scripts": {
     "bundle": "webpack",
     "test": "mocha",
-    "test-cov": "istanbul cover _mocha --report lcovonly"
+    "test-cov": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report lcovonly"
   },
   "devDependencies": {
     "babel-core": "~6.23.1",
