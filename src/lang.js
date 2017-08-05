@@ -18,12 +18,12 @@ const {isArray} = Array
 function isArrayLike (any) {
   if (!isObject(any)) return false
   if (!('length' in any)) return false
-  let length = any.length
+  const length = any.length
   if (!isNumber(length)) return false
   if (length > 0) {
     return (length - 1) in any
   } else {
-    for (let key in any) {
+    for (const key in any) {
       return false
     }
   }
@@ -40,18 +40,18 @@ function isNumber (any) {
  * @returns {Array<String>}
  */
 function getKeys (object) {
-  let keys_ = Object.keys(object)
+  const keys_ = Object.keys(object)
   if (isArray(object)) {
     // skip sort
   } else if (isArrayLike(object)) {
-    let index = keys_.indexOf('length')
+    const index = keys_.indexOf('length')
     if (index > -1) {
       keys_.splice(index, 1)
     }
     // skip sort
   } else {
     // sort
-    keys_ = keys_.sort()
+    keys_.sort()
   }
   return keys_
 }
