@@ -15,14 +15,14 @@ It iterates through a graph or a tree recursively.
 ### Quick overview (es6)
 ```js
 let iterator = new RecursiveIterator(
-    root /*{Object|Array}*/,
-    [bypassMode=0] /*{Number}*/,
-    [ignoreCircular=false] /*{Boolean}*/,
-    [maxDeep=100] /*{Number}*/
-);
+  root /* {Object|Array} */,
+  [bypassMode = 0] /* {Number} */,
+  [ignoreCircular = false] /* {Boolean} */,
+  [maxDeep = 100] /* {Number} */
+)
 
-let {value, done} = iterator.next();
-let {parent, node, key, path, deep} = value;
+let {value, done} = iterator.next()
+let {parent, node, key, path, deep} = value
 
 // parent is parent node
 // node is current node
@@ -34,14 +34,14 @@ let {parent, node, key, path, deep} = value;
 ### Example (es6)
 ```js
 let root = {
-    object: {
-        number: 1
-    },
-    string: 'foo'
-};
+  object: {
+    number: 1
+  },
+  string: 'foo'
+}
 
-for(let {node, path} of new RecursiveIterator(root)) {
-    console.log(path.join('.'), node);
+for (let {node, path} of new RecursiveIterator(root)) {
+  console.log(path.join('.'), node)
 }
 
 // object    Object {number: 1}
