@@ -1,6 +1,6 @@
 
 const RecursiveIterator = require('../src/RecursiveIterator');
-const {expect} = require('chai');
+const assert = require('assert')
 
 describe('Vertical bypass method (bypassMode = 0)', function() {
   let root = {
@@ -22,25 +22,25 @@ describe('Vertical bypass method (bypassMode = 0)', function() {
   }
 
   it('foo [parent, node, key, path, deep]', function() {
-    expect(queue.shift()).to.equal(root);
-    expect(queue.shift()).to.equal(root.object);
-    expect(queue.shift()).to.equal('object');
-    expect(queue.shift().join('.')).to.equal('object');
-    expect(queue.shift()).to.equal(1);
+    assert.equal(queue.shift(), root)
+    assert.equal(queue.shift(), root.object)
+    assert.equal(queue.shift(), 'object')
+    assert.equal(queue.shift().join('.'), 'object')
+    assert.equal(queue.shift(), 1)
   });
   it('foo.bar [parent, node, key, path, deep]', function() {
-    expect(queue.shift()).to.equal(root.object);
-    expect(queue.shift()).to.equal(root.object.number);
-    expect(queue.shift()).to.equal('number');
-    expect(queue.shift().join('.')).to.equal('object.number');
-    expect(queue.shift()).to.equal(2);
+    assert.equal(queue.shift(), root.object)
+    assert.equal(queue.shift(), root.object.number)
+    assert.equal(queue.shift(), 'number')
+    assert.equal(queue.shift().join('.'), 'object.number')
+    assert.equal(queue.shift(), 2)
   });
   it('foo.bar.number [parent, node, key, path, deep]', function() {
-    expect(queue.shift()).to.equal(root);
-    expect(queue.shift()).to.equal(root.string);
-    expect(queue.shift()).to.equal('string');
-    expect(queue.shift().join('.')).to.equal('string');
-    expect(queue.shift()).to.equal(1);
+    assert.equal(queue.shift(), root)
+    assert.equal(queue.shift(), root.string)
+    assert.equal(queue.shift(), 'string')
+    assert.equal(queue.shift().join('.'), 'string')
+    assert.equal(queue.shift(), 1)
   });
 });
 
@@ -65,25 +65,25 @@ describe('Horizontal bypass method (bypassMode = 1)', function() {
   }
 
   it('foo [parent, node, key, path, deep]', function() {
-    expect(queue.shift()).to.equal(root);
-    expect(queue.shift()).to.equal(root.object);
-    expect(queue.shift()).to.equal('object');
-    expect(queue.shift().join('.')).to.equal('object');
-    expect(queue.shift()).to.equal(1);
+    assert.equal(queue.shift(), root)
+    assert.equal(queue.shift(), root.object)
+    assert.equal(queue.shift(), 'object')
+    assert.equal(queue.shift().join('.'), 'object')
+    assert.equal(queue.shift(), 1)
   });
   it('foo.bar [parent, node, key, path, deep]', function() {
-    expect(queue.shift()).to.equal(root);
-    expect(queue.shift()).to.equal(root.string);
-    expect(queue.shift()).to.equal('string');
-    expect(queue.shift().join('.')).to.equal('string');
-    expect(queue.shift()).to.equal(1);
+    assert.equal(queue.shift(), root)
+    assert.equal(queue.shift(), root.string)
+    assert.equal(queue.shift(), 'string')
+    assert.equal(queue.shift().join('.'), 'string')
+    assert.equal(queue.shift(), 1)
   });
   it('foo.string [parent, node, key, path, deep]', function() {
-    expect(queue.shift()).to.equal(root.object);
-    expect(queue.shift()).to.equal(root.object.number);
-    expect(queue.shift()).to.equal('number');
-    expect(queue.shift().join('.')).to.equal('object.number');
-    expect(queue.shift()).to.equal(2);
+    assert.equal(queue.shift(), root.object)
+    assert.equal(queue.shift(), root.object.number)
+    assert.equal(queue.shift(), 'number')
+    assert.equal(queue.shift().join('.'), 'object.number')
+    assert.equal(queue.shift(), 2)
   });
 });
 
@@ -112,10 +112,10 @@ describe('Circular references (exception)', function() {
   }
 
   it('if detected circular reference then will throw an exception', function() {
-    expect(error instanceof Error).to.equal(true);
+    assert.strictEqual(error instanceof Error, true)
   });
   it('if a circular reference refers to root', function() {
-    expect(queue.length).to.equal(5);
+    assert.strictEqual(queue.length, 5)
   });
 });
 
@@ -144,10 +144,10 @@ describe('Circular references (ignore)', function() {
   }
 
   it('ignoreCircular=true', function() {
-    expect(error instanceof Error).to.equal(false);
+    assert.strictEqual(error instanceof  Error, false)
   });
   it('if a circular reference refers to root', function() {
-    expect(queue.length).to.equal(10);
+    assert.strictEqual(queue.length, 10)
   });
 });
 
@@ -172,7 +172,7 @@ describe('Max deep', function() {
   }
 
   it('maxDeep=1', function() {
-    expect(queue.length).to.equal(10);
+    assert.strictEqual(queue.length, 10)
   });
 });
 

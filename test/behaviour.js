@@ -1,6 +1,6 @@
 
 const RecursiveIterator = require('../src/RecursiveIterator');
-const {expect} = require('chai');
+const assert = require('assert')
 
 
 describe('The end of the iteration', function() {
@@ -18,10 +18,10 @@ describe('The end of the iteration', function() {
     iterator.next();
 
     it('item.value must undefined', function() {
-        expect(iterator.next().value).to.be.undefined;
+        assert.strictEqual(iterator.next().value, undefined)
     });
     it('item.done must true', function() {
-        expect(iterator.next().done).to.be.true;
+        assert.strictEqual(iterator.next().done, true)
     });
 });
 

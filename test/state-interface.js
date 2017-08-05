@@ -1,6 +1,6 @@
 
 const RecursiveIterator = require('../src/RecursiveIterator');
-const {expect} = require('chai');
+const assert = require('assert')
 
 
 describe('Actual iteration should return the object of the specified type', function() {
@@ -15,18 +15,18 @@ describe('Actual iteration should return the object of the specified type', func
   let state = iterator.next().value;
 
   it('it object must have "parent" property', function() {
-    expect(state.hasOwnProperty('parent')).to.be.true;
+    assert.strictEqual(state.hasOwnProperty('parent'), true)
   });
   it('it object must have "node" property', function() {
-    expect(state.hasOwnProperty('node')).to.be.true;
+    assert.strictEqual(state.hasOwnProperty('node'), true)
   });
   it('it object must have "key" property', function() {
-    expect(state.hasOwnProperty('key')).to.be.true;
+    assert.strictEqual(state.hasOwnProperty('key'), true)
   });
   it('it object must have "path" property', function() {
-    expect(state.hasOwnProperty('path')).to.be.true;
+    assert.strictEqual(state.hasOwnProperty('path'), true)
   });
   it('it object must have "deep" property', function() {
-    expect(state.hasOwnProperty('deep')).to.be.true;
+    assert.strictEqual(state.hasOwnProperty('deep'), true)
   });
 });

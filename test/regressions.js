@@ -1,6 +1,6 @@
 
 const RecursiveIterator = require('../src/RecursiveIterator');
-const {expect} = require('chai');
+const assert = require('assert')
 
 
 describe('Do not iterate over objects if it keys.length === 0', function() {
@@ -18,7 +18,7 @@ describe('Do not iterate over objects if it keys.length === 0', function() {
   }
 
   it('queue.length must be 0', function() {
-    expect(queue.length).to.equal(0);
+    assert.strictEqual(queue.length, 0)
   });
 });
 
@@ -38,7 +38,7 @@ describe('Iterate through array-like objects', function() {
   }
 
   it('queue.length must be 1', function() {
-    expect(queueOne.length).to.equal(1);
+    assert.strictEqual(queueOne.length, 1)
   });
 
   // This is not array-like object
@@ -56,6 +56,6 @@ describe('Iterate through array-like objects', function() {
   }
 
   it('queue.length must be 3', function() {
-    expect(queueTwo.length).to.equal(3);
+    assert.strictEqual(queueTwo.length, 3)
   });
 });

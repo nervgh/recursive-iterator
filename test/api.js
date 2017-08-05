@@ -1,6 +1,6 @@
 
 const RecursiveIterator = require('../src/RecursiveIterator');
-const {expect} = require('chai');
+const assert = require('assert')
 
 
 describe('Testing of destroy() method', function() {
@@ -14,18 +14,18 @@ describe('Testing of destroy() method', function() {
   it('After call of iterator.destroy() item.value === undefined', function() {
     let iterator = new RecursiveIterator(root);
     iterator.next();
-    expect(iterator.next().value).to.not.be.undefined;
+    assert.notStrictEqual(iterator.next().value, undefined)
     iterator.destroy();
-    expect(iterator.next().value).to.be.undefined;
-    expect(iterator.next().value).to.be.undefined;
+    assert.strictEqual(iterator.next().value, undefined)
+    assert.strictEqual(iterator.next().value, undefined)
   });
   it('After call of iterator.destroy() item.done === true', function() {
     let iterator = new RecursiveIterator(root);
     iterator.next();
-    expect(iterator.next().done).to.be.false;
+    assert.strictEqual(iterator.next().done, false)
     iterator.destroy();
-    expect(iterator.next().done).to.be.true;
-    expect(iterator.next().done).to.be.true;
+    assert.strictEqual(iterator.next().done, true)
+    assert.strictEqual(iterator.next().done, true)
   });
 });
 
@@ -54,7 +54,7 @@ describe('Testing of isNode() method', function() {
       // empty body
     }
 
-    expect(queue.length).to.equal(5);
+    assert.strictEqual(queue.length, 5)
   });
   it('Use isNode() for root node', function() {
     let root = {
@@ -74,7 +74,7 @@ describe('Testing of isNode() method', function() {
       queue.push(true);
     }
 
-    expect(queue.length).to.equal(0);
+    assert.strictEqual(queue.length, 0)
   });
   it('If returns "false" node will be skipped', function() {
     let root = {
@@ -94,7 +94,7 @@ describe('Testing of isNode() method', function() {
       queue.push(item);
     }
 
-    expect(queue.length).to.equal(3);
+    assert.strictEqual(queue.length, 3)
   });
 });
 
@@ -111,9 +111,9 @@ describe('Testing of isLeaf() method', function() {
   let iterator = new RecursiveIterator(root);
 
   it('Leaf is all primitive types', function() {
-    expect(iterator.isLeaf(iterator.next().value.node)).to.be.false; // date
-    expect(iterator.isLeaf(iterator.next().value.node)).to.be.false; // object
-    expect(iterator.isLeaf(iterator.next().value.node)).to.be.true; // string
+    assert.strictEqual(iterator.isLeaf(iterator.next().value.node), false) // date
+    assert.strictEqual(iterator.isLeaf(iterator.next().value.node), false) // object
+    assert.strictEqual(iterator.isLeaf(iterator.next().value.node), true) // string
   });
 });
 
@@ -129,8 +129,8 @@ describe('Testing of isCircular() method', function() {
   let iterator = new RecursiveIterator(root, 0, true);
 
   it('isCircular() returns "true" if object is circular reference', function() {
-    expect(iterator.isCircular(iterator.next().value.node)).to.be.false;
-    expect(iterator.isCircular(iterator.next().value.node)).to.be.true;
-    expect(iterator.isCircular(iterator.next().value.node)).to.be.false;
+    assert.strictEqual(iterator.isCircular(iterator.next().value.node), false)
+    assert.strictEqual(iterator.isCircular(iterator.next().value.node), true)
+    assert.strictEqual(iterator.isCircular(iterator.next().value.node), false)
   });
 });
