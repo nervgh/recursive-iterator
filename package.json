@@ -1,7 +1,7 @@
 {
   "name": "recursive-iterator",
   "version": "3.2.0",
-  "description": "Iterates through graph or tree recursively",
+  "description": "It iterates through a graph or a tree recursively",
   "homepage": "https://github.com/nervgh/recursive-iterator",
   "license": "MIT",
   "main": "src/RecursiveIterator.js",

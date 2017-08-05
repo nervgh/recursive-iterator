@@ -5,7 +5,7 @@
 [![Test coverage][coveralls-image]][coveralls-url]
 
 ## About
-Iterates through graph or tree recursively.
+It iterates through a graph or a tree recursively.
 
 ## Versions
 + for support ES5 see `2.x.x` versions
