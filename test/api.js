@@ -97,24 +97,6 @@ describe('Testing of isNode() method', function () {
   })
 })
 
-describe('Testing of isLeaf() method', function () {
-  let root = {
-    date: new Date(),
-    object: {
-      number: 1
-    },
-    string: 'walker'
-  }
-
-  let iterator = new RecursiveIterator(root)
-
-  it('Leaf is all primitive types', function () {
-    assert.strictEqual(iterator.isLeaf(iterator.next().value.node), false) // date
-    assert.strictEqual(iterator.isLeaf(iterator.next().value.node), false) // object
-    assert.strictEqual(iterator.isLeaf(iterator.next().value.node), true) // string
-  })
-})
-
 describe('Testing of isCircular() method', function () {
   let root = {
     array: [],

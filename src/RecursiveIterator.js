@@ -80,13 +80,6 @@ class RecursiveIterator {
    * @param {*} any
    * @returns {Boolean}
    */
-  isLeaf (any) {
-    return !this.isNode(any)
-  }
-  /**
-   * @param {*} any
-   * @returns {Boolean}
-   */
   isCircular (any) {
     return this[CACHE].indexOf(any) !== -1
   }
