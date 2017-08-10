@@ -33,21 +33,17 @@ class RecursiveIterator {
   next () {
     const {node, path, deep} = this[STATE] || EMPTY_STATE
 
-    if (this[MAX_DEEP] > deep) {
-      if (this.isNode(node)) {
-        if (this.isCircular(node)) {
-          if (this[IGNORE_CIRCULAR]) {
-            // skip
-          } else {
-            throw new Error('Circular reference')
-          }
-        } else {
-          if (this.onStepInto(this[STATE])) {
-            const descriptors = this.getStatesOfChildNodes(node, path, deep)
-            const method = this[BYPASS_MODE] ? 'push' : 'unshift'
-            this[QUEUE][method](...descriptors)
-            this[CACHE].push(node)
-          }
+    if (this[MAX_DEEP] > deep && this.isNode(node)) {
+      if (this.isCircular(node)) {
+        if (!this[IGNORE_CIRCULAR]) {
+          throw new Error('Circular reference')
+        }
+      } else {
+        if (this.onStepInto(this[STATE])) {
+          const descriptors = this.getStatesOfChildNodes(node, path, deep)
+          const method = this[BYPASS_MODE] ? 'push' : 'unshift'
+          this[QUEUE][method](...descriptors)
+          this[CACHE].push(node)
         }
       }
     }
